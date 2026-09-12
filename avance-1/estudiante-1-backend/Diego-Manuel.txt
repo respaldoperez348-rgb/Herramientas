@@ -1,1 +1,6 @@
-
+Integrante 1 — Backend + IA
+	Arquitectura. 
+	Backend. 
+	Lógica del sistema. 
+	Motor de recomendaciones. 
+	Integración de IA. 
