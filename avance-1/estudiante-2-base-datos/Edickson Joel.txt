@@ -1,1 +1,6 @@
-
+ Integrante 2 — Base de datos + funcionalidades
+	Modelo de datos. 
+	Base de datos. 
+	Persistencia de hábitos. 
+	Metas y progreso. 
+	Recordatorios. 
