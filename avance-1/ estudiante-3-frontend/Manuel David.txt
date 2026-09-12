@@ -1,1 +1,6 @@
-
+ Integrante 3 — Frontend + UX
+	Diseño de interfaz. 
+	Prototipos. 
+	Pantallas. 
+	Experiencia de usuario. 
+	Interfaz del asistente. 
