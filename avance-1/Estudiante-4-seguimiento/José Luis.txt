@@ -1,1 +1,6 @@
-
+ Integrante 4 — Funcionalidades inteligentes + pruebas
+	Seguimiento de hábitos. 
+	Recomendaciones. 
+	Detección de bajo cumplimiento. 
+	Pruebas del asistente. 
+	Apoyo en integración.
