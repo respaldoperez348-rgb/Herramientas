@@ -26,3 +26,27 @@ CREATE TABLE IF NOT EXISTS registros_habitos (
     CONSTRAINT fk_registros_habitos FOREIGN KEY (id_habito) REFERENCES habitos (id_habito) ON DELETE CASCADE, 
     CONSTRAINT uq_habito_fecha UNIQUE (id_habito, fecha)
 );
+
+CREATE TABLE IF NOT EXISTS metas (
+    id_meta SERIAL PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_habito INT,
+    titulo VARCHAR(100) NOT NULL,
+    progreso_porcentaje NUMERIC(5, 2) DEFAULT 0.00,
+    fecha_limite DATE,
+    estado VARCHAR(20) DEFAULT 'En progreso', 
+    CONSTRAINT fk_metas_usuario FOREIGN KEY (id_usuario) 
+    REFERENCES usuarios (id_usuario) ON DELETE CASCADE,
+    CONSTRAINT fk_metas_habito FOREIGN KEY (id_habito)
+    REFERENCES habitos (id_habito) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS recordatorios (
+    id_recordatorio SERIAL PRIMARY KEY,
+    id_habito INT NOT NULL,
+    hora TIME WITHOUT TIME ZONE NOT NULL,
+    dias_semana VARCHAR(50) NOT NULL,
+    activo BOOLEAN DEFAULT TRUE,
+    mensaje VARCHAR(200),
+    CONSTRAINT fk_recordatorio_habito FOREIGN KEY (id_habito) REFERENCES habitos (id_habito) ON DELETE CASCADE
+);
