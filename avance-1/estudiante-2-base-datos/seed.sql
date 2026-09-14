@@ -1,7 +1,6 @@
 -- Datos de prueba para verificar funcionamiento
 INSERT INTO usuarios (nombre, correo, contrasena) VALUES
-('Juan Perez', 'juan.perez@example.com', 'hash_pass_123'),
-('Maria Lopez', 'maria.lopez@example.com', 'hash_pass_456');
+('Juan Perez', 'juan.perez@gmail.com', 'pass_123');
 
 INSERT INTO habitos (id_usuario, nombre, categoria, frecuencia) VALUES
 (1, 'Beber 2L de agua', 'Salud', 'Diaria'),
