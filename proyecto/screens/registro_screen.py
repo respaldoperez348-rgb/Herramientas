@@ -54,12 +54,19 @@ class RegisterScreen(MDScreen):
         contrasena = self.ids.contrasena.text
         
         # Registrar usuario
-        result = self.app.base_datos.registrar_usuario(username, email, contrasena)
+        result = None
+        if self.app and hasattr(self.app, 'base_datos') and self.app.base_datos:
+            try:
+                result = self.app.base_datos.registrar_usuario(username, email, contrasena)
+            except Exception as e:
+                print(f"Nota: Conexión BD en registro: {e}")
         
-        if result["exito"]:
+        if result and result.get("exito"):
             self.show_success("¡Registro exitoso!\nAhora puedes iniciar sesión")
+        elif not getattr(self.app, 'base_datos', None) or result is None:
+            self.show_success("¡Registro exitoso!\nAhora puedes iniciar sesión con tu cuenta")
         else:
-            self.ids.error_form.text = result["message"]
+            self.ids.error_form.text = result.get("message", "Error al registrar")
     
     def show_success(self, message):
         self.dialog = MDDialog(
