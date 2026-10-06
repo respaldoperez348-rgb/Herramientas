@@ -40,4 +40,3 @@ INSERT INTO recordatorios (id_habito, hora, dias_semana, activo, mensaje) VALUES
 (1, '08:30:00', 'Lunes, Martes, Miercoles, Jueves, Viernes', TRUE, 'Hora de tu primer vaso con agua del dia'),
 (2, '21:00:00', 'Lunes a Domingo', TRUE, 'Toma tu libro y apaga las pantallas'),
 (4, '07:00:00', 'Lunes a Domingo', TRUE, 'Inicia el dia con 10 min de respiracion');
-
