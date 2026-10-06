@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS preferencias_ia(
     id_preferencia SERIAL PRIMARY KEY,
     id_usuario INT NOT NULL UNIQUE,
     rango_horario_optimo VARCHAR(100),
-    CONSTRAINT fk_preferencias_usuario FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE
+    CONSTRAINT fk_preferencias_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
 );
 
 --Tabla de historial de recomendaciones y alertas IA
@@ -15,8 +15,8 @@ CREATE TABLE IF NOT EXISTS recomendaciones_ia(
     mensaje_sugerido TEXT NOT NULL,
     fecha_generacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     aplicada BOOLEAN DEFAULT FALSE,
-    CONSTRAINT fk_recomendaciones_usuario FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE,
-    CONSTRAINT fk_recomendaciones_habito FOREIGN KEY (id_habito) REFERENCES habito(id_habito) ON DELETE CASCADE
+    CONSTRAINT fk_recomendaciones_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+    CONSTRAINT fk_recomendaciones_habito FOREIGN KEY (id_habito) REFERENCES habitos(id_habito) ON DELETE CASCADE
 );
 
 --Modificar la tabla actual de recordatorios para hacerlos "inteligentes"
