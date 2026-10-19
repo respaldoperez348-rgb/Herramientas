@@ -1,4 +1,4 @@
--- MODULO: INTEGRACIÓN Y PRUEBAS 
+-- MODULO: INTEGRACIÓN Y PRUEBAS (Semana 11)
 -- Pruebas de Integración (End-to-End)
 
 
@@ -22,9 +22,9 @@ BEGIN
     
     RAISE NOTICE 'Prueba 1 superada: Usuario e IA creados.';
 
-    -- PRUEBA 2: Creación de Hábito y Recordatorio
-    INSERT INTO habitos (id_usuario, nombre, descripcion, frecuencia) 
-    VALUES (v_nuevo_usuario, 'Caminar 30 min', 'Prueba de integración', 'Diaria')
+    -- PRUEBA 2: Creación de Hábito y Recordatorio (Se añade 'categoria')
+    INSERT INTO habitos (id_usuario, nombre, categoria, frecuencia) 
+    VALUES (v_nuevo_usuario, 'Caminar 30 min', 'Salud', 'Diaria')
     RETURNING id_habito INTO v_nuevo_habito;
 
     INSERT INTO recordatorios (id_habito, hora, dias_semana, activo, es_inteligente)
@@ -46,9 +46,6 @@ BEGIN
     RAISE NOTICE 'Prueba 4 superada: Actualización realizada, trigger disparado.';
 
 END $$;
-
--- Verificamos si la auditoría capturó el cambio de la Prueba 4
--- SELECT * FROM auditoria_sistema;
 
 -- Deshacemos todos los cambios generados en esta prueba para dejar la BD limpia
 ROLLBACK;
