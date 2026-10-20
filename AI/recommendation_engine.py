@@ -1,31 +1,46 @@
+
+if __package__:
+    from .habit_analyzer import analizar_habitos
+    from .recommendation_rules import generar_recomendaciones
+else:
+    from habit_analyzer import analizar_habitos
+    from recommendation_rules import generar_recomendaciones
+
+
 class RecommendationEngine:
     """
-    Motor encargado de generar
-    recomendaciones personalizadas.
+    Motor encargado de coordinar el análisis
+    y la generación de recomendaciones.
     """
 
     def generar_recomendacion(self, habitos):
+        """
+        Recibe una lista de hábitos y devuelve
+        estadísticas y recomendaciones.
+        """
 
         if not habitos:
-            return (
-                "Aún no tienes hábitos registrados. "
-                "Comienza agregando uno."
-            )
+            return {
+                "estadisticas": {
+                    "total_habitos": 0,
+                    "completados": 0,
+                    "pendientes": 0,
+                    "porcentaje_promedio": 0
+                },
+                "recomendaciones": [
+                    "Aún no tienes hábitos registrados. "
+                    "Comienza agregando uno."
+                ]
+            }
 
-        pendientes = [
-            habit for habit in habitos
-            if not habit.completado
-        ]
+        estadisticas = analizar_habitos(habitos)
 
-        if pendientes:
-            habit = pendientes[0]
-
-            return (
-                f"Recuerda completar tu hábito: "
-                f"{habit.nombre}."
-            )
-
-        return (
-            "¡Excelente! Has completado "
-            "todos tus hábitos registrados."
+        recomendaciones = generar_recomendaciones(
+            estadisticas,
+            habitos
         )
+
+        return {
+            "estadisticas": estadisticas,
+            "recomendaciones": recomendaciones
+        }
