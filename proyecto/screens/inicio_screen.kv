@@ -5,99 +5,81 @@
 <HabitCard>:
     ripple_behavior: True
     size_hint_y: None
-    height: "120dp"
-    padding: dp(15)
-    radius: dp(12)
+    height: dp(120)
+    padding: dp(14)
+    radius: [dp(12), dp(12), dp(12), dp(12)]
     md_bg_color: 0.12, 0.16, 0.23, 1
     elevation: 3
     
     BoxLayout:
         orientation: 'vertical'
-        spacing: dp(1)
+        spacing: dp(2)
         
-        # Fila superior: Nombre + Botón menú - MODIFICADO
-        RelativeLayout:
+        # Fila superior: Nombre + Objetivo + Menú
+        BoxLayout:
+            orientation: 'horizontal'
             size_hint_y: None
-            height: dp(30)  # Altura suficiente para título y botón
+            height: dp(28)
+            spacing: dp(6)
             
-            # Nombre del hábito
             MDLabel:
                 text: root.nombre
-                font_style: "H6"
+                font_style: "Subtitle1"
                 bold: True
                 theme_text_color: "Custom"
                 text_color: 1, 1, 1, 1
-                size_hint_x: 0.7
-                size_hint_y: None
-                height: dp(30)
-                halign: "left"
-                valign: "middle"
-                text_size: self.width, None
-                pos_hint: {'left': 1, 'center_y': 0.5}
+                size_hint_x: 0.65
+                shorten: True
+                shorten_from: 'right'
             
-            # Objetivo
             MDLabel:
-                text: f"{root.objetivo}min"
+                text: f"{root.objetivo} min"
                 font_style: "Caption"
+                bold: True
                 theme_text_color: "Custom"
-                text_color: 0.16, 0.73, 0.51, 1
-                size_hint: None, None
-                size: dp(50), dp(20)
+                text_color: 0.16, 0.85, 0.55, 1
+                size_hint_x: 0.25
                 halign: "right"
-                valign: "middle"
-                text_size: self.size
-                pos_hint: {'right': 0.85, 'center_y': 0.5}
             
             MDIconButton:
                 icon: "dots-vertical"
                 theme_text_color: "Custom"
-                text_color: 0.7, 0.7, 0.7, 1
+                text_color: 0.7, 0.75, 0.85, 1
                 size_hint: None, None
-                size: dp(40), dp(40) 
-                padding: dp(10)
-                pos_hint: {'right': 1, 'center_y': 0.5} 
+                size: dp(24), dp(24)
+                padding: dp(2)
                 on_release: root.menu.open()
         
         MDLabel:
-            text: root.descripcion
+            text: root.descripcion if root.descripcion else "Sin descripción"
             font_style: "Caption"
             theme_text_color: "Custom"
-            text_color: 0.7, 0.7, 0.7, 1
+            text_color: 0.65, 0.7, 0.8, 1
             size_hint_y: None
-            height: dp(20) if root.descripcion else 0
-            opacity: 1 if root.descripcion else 0
-            text_size: self.width, None
-            halign: "left"
-            valign: "top"
-            padding_y: dp(-2)
+            height: dp(18)
+            shorten: True
+            shorten_from: 'right'
         
-        Widget:
-            size_hint_y: None
-            height: dp(5) if root.descripcion else dp(10)
-        
+        # Métricas del hábito (Sesiones, Racha, Total)
         GridLayout:
             cols: 3
-            spacing: dp(10)
+            spacing: dp(6)
             size_hint_y: None
-            height: dp(40)
+            height: dp(42)
             
             # Sesiones
             BoxLayout:
                 orientation: 'vertical'
-                spacing: dp(2)
-                
+                spacing: 0
                 MDLabel:
                     text: "Sesiones"
                     font_style: "Overline"
                     halign: "center"
                     theme_text_color: "Custom"
-                    text_color: 0.7, 0.7, 0.7, 1
-                    size_hint_y: None
-                    height: dp(15)
-                
+                    text_color: 0.6, 0.65, 0.75, 1
                 MDLabel:
                     text: str(root.sesiones)
-                    font_style: "H6"
+                    font_style: "Subtitle1"
                     bold: True
                     halign: "center"
                     theme_text_color: "Custom"
@@ -106,120 +88,113 @@
             # Racha
             BoxLayout:
                 orientation: 'vertical'
-                spacing: dp(2)
-                
+                spacing: 0
                 MDLabel:
                     text: "Racha"
                     font_style: "Overline"
                     halign: "center"
                     theme_text_color: "Custom"
-                    text_color: 0.7, 0.7, 0.7, 1
-                    size_hint_y: None
-                    height: dp(15)
-                
+                    text_color: 0.6, 0.65, 0.75, 1
                 MDLabel:
                     text: f"{root.racha}d"
-                    font_style: "H6"
+                    font_style: "Subtitle1"
                     bold: True
                     halign: "center"
                     theme_text_color: "Custom"
                     text_color: 1, 0.65, 0, 1
             
-            # Total
+            # Total Minutos
             BoxLayout:
                 orientation: 'vertical'
-                spacing: dp(2)
-                
+                spacing: 0
                 MDLabel:
                     text: "Total"
                     font_style: "Overline"
                     halign: "center"
                     theme_text_color: "Custom"
-                    text_color: 0.7, 0.7, 0.7, 1
-                    size_hint_y: None
-                    height: dp(15)
-                
+                    text_color: 0.6, 0.65, 0.75, 1
                 MDLabel:
                     text: f"{root.total_min}m"
-                    font_style: "H6"
+                    font_style: "Subtitle1"
                     bold: True
                     halign: "center"
                     theme_text_color: "Custom"
-                    text_color: 0.8, 0.5, 1, 1
+                    text_color: 0.8, 0.55, 1, 1
 
 <InicioScreen>:
     FloatLayout:
         canvas.before:
             Color:
-                rgba: 0.05, 0.05, 0.05, 1
+                rgba: 0.07, 0.09, 0.13, 1
             Rectangle:
                 pos: self.pos
                 size: self.size
         
-        # Header
+        # Header Superior
         BoxLayout:
-            orientation: 'vertical'
-            size_hint: None, None
-            size: 300, 100
-            pos_hint: {'x': 0.05, 'top': 1.04}
-            spacing: 5
+            orientation: 'horizontal'
+            size_hint: 0.92, None
+            height: dp(50)
+            pos_hint: {'center_x': 0.5, 'top': 0.98}
             
-            MDLabel:
-                text: "HabitTracker"
-                font_style: "H6"
-                bold: True
-                halign: "left"
-                size_hint_y: None
-                height: 40
-                theme_text_color: "Custom"
-                text_color: 0, 0.9686, 1, 1
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_x: 0.75
+                spacing: 0
+                
+                MDLabel:
+                    text: "HabitTracker"
+                    font_style: "H6"
+                    bold: True
+                    theme_text_color: "Custom"
+                    text_color: 0, 0.97, 1, 1
+                
+                MDLabel:
+                    id: bienvenido
+                    text: "¡Hola, Manuel David!"
+                    font_size: "12sp"
+                    theme_text_color: "Custom"
+                    text_color: 0.7, 0.75, 0.85, 1
             
-            MDLabel:
-                id: bienvenido
-                text: "Hola, Usuario"
-                font_size: "14sp"
-                halign: "left"
-                size_hint_y: None
-                height: 15
-                theme_text_color: "Custom"
-                text_color: 0.8, 0.8, 0.8, 1
-        
-        # Botón salir
-        MDRaisedButton:
-            text: "Salir"
-            size_hint: None, None
-            size: 80, 40
-            pos_hint: {'right': 0.95, 'top': 0.97}
-            md_bg_color: 0.3, 0.3, 0.3, 1
-            text_color: 1, 1, 1, 1
-            on_release: root.logout()
+            MDRaisedButton:
+                text: "Salir"
+                font_size: "11sp"
+                size_hint: None, None
+                size: dp(65), dp(32)
+                pos_hint: {'center_y': 0.5}
+                md_bg_color: 0.22, 0.26, 0.35, 1
+                text_color: 1, 1, 1, 1
+                on_release: root.logout()
         
         # Barra de progreso general
         MDCard:
             orientation: 'vertical'
-            size_hint: 0.9, None
-            height: dp(70)
-            pos_hint: {'center_x': 0.5, 'top': 0.88}
-            padding: dp(15)
-            spacing: dp(10)
-            radius: dp(12)
+            size_hint: 0.92, None
+            height: dp(64)
+            pos_hint: {'center_x': 0.5, 'top': 0.89}
+            padding: [dp(12), dp(8)]
+            spacing: dp(4)
+            radius: [dp(12), dp(12), dp(12), dp(12)]
             md_bg_color: 0.12, 0.16, 0.23, 1
+            elevation: 2
             
             BoxLayout:
                 orientation: 'horizontal'
+                size_hint_y: None
+                height: dp(20)
                 
                 MDLabel:
                     id: progreso_general_texto
-                    text: "Progreso General"
+                    text: "Cumplimiento General Hoy"
                     font_style: "Caption"
                     theme_text_color: "Custom"
-                    text_color: 0.7, 0.7, 0.7, 1
+                    text_color: 0.7, 0.75, 0.85, 1
                     size_hint_x: 0.7
                 
                 MDLabel:
                     id: progreso_general_porcentaje
                     text: "0%"
-                    font_style: "H6"
+                    font_style: "Subtitle2"
                     bold: True
                     halign: "right"
                     theme_text_color: "Custom"
@@ -233,181 +208,180 @@
                 size_hint_y: None
                 height: dp(8)
         
-        # Estadísticas (2x2)
+        # Estadísticas 4 métricas (Sesiones, Tiempo, Racha, Hoy)
         GridLayout:
-            cols: 2
-            spacing: 15
-            size_hint: 0.9, None
-            height: dp(200)
-            pos_hint: {'center_x': 0.5, 'top': 0.75}
+            cols: 4
+            spacing: dp(8)
+            size_hint: 0.92, None
+            height: dp(62)
+            pos_hint: {'center_x': 0.5, 'top': 0.78}
             
-            # Card Sesiones
+            # 1: Sesiones
             MDCard:
-                size_hint: None, None
-                size: self.parent.width/2 - 10, dp(90)
+                radius: [dp(10), dp(10), dp(10), dp(10)]
                 md_bg_color: 0.12, 0.16, 0.23, 1
-                elevation: 2
-                radius: dp(10)
-                padding: dp(10)
-                
+                elevation: 1
+                padding: dp(4)
                 BoxLayout:
                     orientation: 'vertical'
-                    spacing: dp(5)
-                    
+                    spacing: 0
                     MDLabel:
                         text: "Sesiones"
-                        font_size: "12sp"
-                        bold: True
+                        font_size: "9sp"
                         halign: "center"
                         theme_text_color: "Custom"
-                        text_color: 0.7, 0.7, 0.7, 1
-                        size_hint_y: None
-                        height: dp(20)
-                    
+                        text_color: 0.6, 0.65, 0.75, 1
                     MDLabel:
                         id: sesiones
                         text: "0"
-                        font_style: "H5"
+                        font_style: "Subtitle1"
                         bold: True
                         halign: "center"
                         theme_text_color: "Custom"
-                        text_color: 0, 0.9686, 1, 1
-                        size_hint_y: None
-                        height: dp(40)
-                        
-                    MDLabel:
-                        text: "Total"
-                        font_size: "10sp"
-                        halign: "center"
-                        theme_text_color: "Custom"
-                        text_color: 0.5, 0.5, 0.5, 1
+                        text_color: 0, 0.97, 1, 1
             
-            # Card Tiempo
+            # 2: Tiempo
             MDCard:
-                size_hint: None, None
-                size: self.parent.width/2 - 10, dp(90)
+                radius: [dp(10), dp(10), dp(10), dp(10)]
                 md_bg_color: 0.12, 0.16, 0.23, 1
-                elevation: 2
-                radius: dp(10)
-                padding: dp(10)
-                
+                elevation: 1
+                padding: dp(4)
                 BoxLayout:
                     orientation: 'vertical'
-                    spacing: dp(5)
-                    
+                    spacing: 0
                     MDLabel:
-                        text: "Tiempo"
-                        font_size: "12sp"
-                        bold: True
+                        text: "Minutos"
+                        font_size: "9sp"
                         halign: "center"
                         theme_text_color: "Custom"
-                        text_color: 0.7, 0.7, 0.7, 1
-                        size_hint_y: None
-                        height: dp(20)
-                    
+                        text_color: 0.6, 0.65, 0.75, 1
                     MDLabel:
                         id: tiempo
                         text: "0"
-                        font_style: "H5"
+                        font_style: "Subtitle1"
                         bold: True
                         halign: "center"
-                        theme_text_color: "Custom" 
-                        text_color: 0.8, 0.5, 1, 1
-                        size_hint_y: None
-                        height: dp(40)
-                        
-                    MDLabel:
-                        text: "Minutos"
-                        font_size: "10sp"
-                        halign: "center"
                         theme_text_color: "Custom"
-                        text_color: 0.5, 0.5, 0.5, 1
+                        text_color: 0.8, 0.55, 1, 1
             
-            # Card Racha
+            # 3: Racha
             MDCard:
-                size_hint: None, None
-                size: self.parent.width/2 - 10, dp(90)
+                radius: [dp(10), dp(10), dp(10), dp(10)]
                 md_bg_color: 0.12, 0.16, 0.23, 1
-                elevation: 2
-                radius: dp(10)
-                padding: dp(10)
-                
+                elevation: 1
+                padding: dp(4)
                 BoxLayout:
                     orientation: 'vertical'
-                    spacing: dp(5)
-                    
+                    spacing: 0
                     MDLabel:
                         text: "Racha"
-                        font_size: "12sp"
-                        bold: True
+                        font_size: "9sp"
                         halign: "center"
                         theme_text_color: "Custom"
-                        text_color: 0.7, 0.7, 0.7, 1
-                        size_hint_y: None
-                        height: dp(20)
-                    
+                        text_color: 0.6, 0.65, 0.75, 1
                     MDLabel:
                         id: racha
                         text: "0"
-                        font_style: "H5"
+                        font_style: "Subtitle1"
                         bold: True
-                        halign: "center"
-                        theme_text_color:"Custom"
-                        text_color: 1, 0.5, 0, 1
-                        size_hint_y: None
-                        height: dp(40)
-                        
-                    MDLabel:
-                        text: "Días"
-                        font_size: "10sp"
                         halign: "center"
                         theme_text_color: "Custom"
-                        text_color: 0.5, 0.5, 0.5, 1
+                        text_color: 1, 0.65, 0, 1
             
-            # Card Hoy
+            # 4: Hoy
             MDCard:
-                size_hint: None, None
-                size: self.parent.width/2 - 10, dp(90)
+                radius: [dp(10), dp(10), dp(10), dp(10)]
                 md_bg_color: 0.12, 0.16, 0.23, 1
-                elevation: 2
-                radius: dp(10)
-                padding: dp(10)
-                
+                elevation: 1
+                padding: dp(4)
                 BoxLayout:
                     orientation: 'vertical'
-                    spacing: dp(5)
-                    
+                    spacing: 0
                     MDLabel:
-                        text: "Hoy"
-                        font_size: "12sp"
-                        bold: True
+                        text: "Hoy (m)"
+                        font_size: "9sp"
                         halign: "center"
-                        theme_text_color:"Custom"
-                        text_color: 0.7, 0.7, 0.7, 1
-                        size_hint_y: None
-                        height: dp(20)
-                    
+                        theme_text_color: "Custom"
+                        text_color: 0.6, 0.65, 0.75, 1
                     MDLabel:
                         id: hoy
                         text: "0"
-                        font_style: "H5"
+                        font_style: "Subtitle1"
                         bold: True
                         halign: "center"
-                        theme_text_color:"Custom"
-                        text_color: 0.2, 0.8, 0.2, 1
-                        size_hint_y: None
-                        height: dp(40)
-                        
-                    MDLabel:
-                        text: "Minutos"
-                        font_size: "10sp"
-                        halign: "center"
                         theme_text_color: "Custom"
-                        text_color: 0.5, 0.5, 0.5, 1
-        
+                        text_color: 0.16, 0.85, 0.55, 1
+
+        # Banner Inteligente de Asistente IA (Acceso Rápido)
+        MDCard:
+            size_hint: 0.92, None
+            height: dp(38)
+            pos_hint: {'center_x': 0.5, 'top': 0.67}
+            radius: [dp(10), dp(10), dp(10), dp(10)]
+            md_bg_color: 0.20, 0.14, 0.18, 1
+            padding: [dp(8), dp(4)]
+            elevation: 1
+            ripple_behavior: True
+            on_release: root.app.cambiar_pantalla('asistente', 'left')
+
+            BoxLayout:
+                orientation: 'horizontal'
+                spacing: dp(6)
+                
+                MDIconButton:
+                    icon: "robot"
+                    theme_text_color: "Custom"
+                    text_color: 1, 0.4, 0.4, 1
+                    size_hint: None, None
+                    size: dp(24), dp(24)
+                    padding: dp(2)
+                
+                MDLabel:
+                    text: "🤖 Asistente: 1 hábito en riesgo (<50%). Toca para auditar."
+                    font_size: "10sp"
+                    bold: True
+                    theme_text_color: "Custom"
+                    text_color: 1, 0.85, 0.7, 1
+                    shorten: True
+                    shorten_from: 'right'
+                
+                MDIconButton:
+                    icon: "chevron-right"
+                    theme_text_color: "Custom"
+                    text_color: 1, 0.85, 0.7, 1
+                    size_hint: None, None
+                    size: dp(20), dp(20)
+                    padding: dp(2)
+
+        # Encabezado lista de hábitos y botón agregar
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: 0.92, None
+            height: dp(30)
+            pos_hint: {'center_x': 0.5, 'top': 0.60}
+            
+            MDLabel:
+                text: "Mis Hábitos Activos"
+                font_style: "Subtitle2"
+                bold: True
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+                size_hint_x: 0.65
+            
+            MDFillRoundFlatButton:
+                text: "+ Hábito"
+                font_size: "11sp"
+                size_hint: None, None
+                size: dp(85), dp(28)
+                pos_hint: {'center_y': 0.5}
+                md_bg_color: 0.1, 0.55, 0.9, 1
+                text_color: 1, 1, 1, 1
+                on_release: root.add_new_habit()
+
+        # Lista de Hábitos (ScrollView)
         ScrollView:
-            size_hint: 0.9, 0.34
-            pos_hint: {'center_x': 0.5, 'y': 0.1}
+            size_hint: 0.92, 0.43
+            pos_hint: {'center_x': 0.5, 'y': 0.11}
             effect_cls: ScrollEffect
             
             GridLayout:
@@ -415,16 +389,90 @@
                 cols: 1
                 size_hint_y: None
                 height: self.minimum_height
-                spacing: dp(15)
-                padding: [0, dp(10), 0, dp(20)]
-        
-        # Botón para agregar hábitos
-        MDRaisedButton:
-            id: add_button
-            text: "+ Nuevo Habito"
-            size_hint: 0.9, None
-            height: dp(50)
-            pos_hint: {'center_x': 0.5, 'y': 0.03}
-            md_bg_color: 0.2, 0.5, 0.9, 1
-            elevation: 4
-            on_release: root.add_new_habit()
+                spacing: dp(10)
+                padding: [0, dp(4), 0, dp(20)]
+
+        # Barra de Navegación Inferior Móvil
+        MDCard:
+            size_hint: 1, None
+            height: dp(56)
+            pos_hint: {'bottom': 1, 'center_x': 0.5}
+            md_bg_color: 0.10, 0.13, 0.18, 1
+            elevation: 8
+            radius: [dp(14), dp(14), 0, 0]
+            padding: [dp(4), dp(2)]
+
+            BoxLayout:
+                orientation: 'horizontal'
+
+                # Tab 1: Inicio (Activo)
+                BoxLayout:
+                    orientation: 'vertical'
+                    size_hint_x: 0.25
+                    spacing: 0
+                    MDIconButton:
+                        icon: "view-dashboard"
+                        theme_text_color: "Custom"
+                        text_color: 0, 0.97, 1, 1
+                        pos_hint: {'center_x': 0.5}
+                    MDLabel:
+                        text: "Hábitos"
+                        font_size: "9sp"
+                        bold: True
+                        halign: "center"
+                        theme_text_color: "Custom"
+                        text_color: 0, 0.97, 1, 1
+
+                # Tab 2: Metas
+                BoxLayout:
+                    orientation: 'vertical'
+                    size_hint_x: 0.25
+                    spacing: 0
+                    MDIconButton:
+                        icon: "target"
+                        theme_text_color: "Custom"
+                        text_color: 0.5, 0.55, 0.65, 1
+                        pos_hint: {'center_x': 0.5}
+                        on_release: root.app.cambiar_pantalla('metas', 'left')
+                    MDLabel:
+                        text: "Metas"
+                        font_size: "9sp"
+                        halign: "center"
+                        theme_text_color: "Custom"
+                        text_color: 0.5, 0.55, 0.65, 1
+
+                # Tab 3: Recordatorios
+                BoxLayout:
+                    orientation: 'vertical'
+                    size_hint_x: 0.25
+                    spacing: 0
+                    MDIconButton:
+                        icon: "bell-ring"
+                        theme_text_color: "Custom"
+                        text_color: 0.5, 0.55, 0.65, 1
+                        pos_hint: {'center_x': 0.5}
+                        on_release: root.app.cambiar_pantalla('recordatorios', 'left')
+                    MDLabel:
+                        text: "Horarios"
+                        font_size: "9sp"
+                        halign: "center"
+                        theme_text_color: "Custom"
+                        text_color: 0.5, 0.55, 0.65, 1
+
+                # Tab 4: Asistente
+                BoxLayout:
+                    orientation: 'vertical'
+                    size_hint_x: 0.25
+                    spacing: 0
+                    MDIconButton:
+                        icon: "robot"
+                        theme_text_color: "Custom"
+                        text_color: 0.5, 0.55, 0.65, 1
+                        pos_hint: {'center_x': 0.5}
+                        on_release: root.app.cambiar_pantalla('asistente', 'left')
+                    MDLabel:
+                        text: "Asistente"
+                        font_size: "9sp"
+                        halign: "center"
+                        theme_text_color: "Custom"
+                        text_color: 0.5, 0.55, 0.65, 1
