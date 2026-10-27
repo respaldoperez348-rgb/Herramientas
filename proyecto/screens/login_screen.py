@@ -7,11 +7,11 @@ class LoginScreen(MDScreen):
         self.app = None  # Se asignará desde main.py
     
     def on_pre_enter(self):
-        # Limpiar campos al entrar
-        if hasattr(self.ids, 'email'):
-            self.ids.email.text = ""
-        if hasattr(self.ids, 'contrasena'):
-            self.ids.contrasena.text = ""
+        # Sugerir credenciales demo si están vacíos para agilizar pruebas
+        if hasattr(self.ids, 'email') and not self.ids.email.text:
+            self.ids.email.text = "david.tineo@email.com"
+        if hasattr(self.ids, 'contrasena') and not self.ids.contrasena.text:
+            self.ids.contrasena.text = "master.1"
         if hasattr(self.ids, 'error_form'):
             self.ids.error_form.text = ""
     

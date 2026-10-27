@@ -18,7 +18,8 @@ from screens.recordatorios_screen import RecordatoriosScreen
 from screens.asistente_screen import AsistenteScreen
 from screens.detalle_habito_screen import DetalleHabitoScreen
 
-Window.size = (360, 640)
+Window.size = (380, 760)
+Window.resizable = False
 
 class HabitTrackerApp(MDApp):
     def __init__(self, **kwargs):
@@ -58,37 +59,26 @@ class HabitTrackerApp(MDApp):
         except Exception as e:
             print(f"Error al registrar fuente: {e}")
         
+        self.title = "HabitPulse"
         self.theme_cls.theme_style = "Dark"
-        self.theme_cls.primary_palette = "Teal"
+        self.theme_cls.primary_palette = "Red"
         
         self.cargar_archivos_kv()
         
-        # Instanciar todas las pantallas del Avance 2 (Frontend - Integrante 3)
-        pantalla_login = LoginScreen(name='login')
-        pantalla_registro = RegisterScreen(name='registro')
-        pantalla_inicio = InicioScreen(name='inicio')
-        pantalla_metas = MetasScreen(name='metas')
-        pantalla_recordatorios = RecordatoriosScreen(name='recordatorios')
-        pantalla_asistente = AsistenteScreen(name='asistente')
-        pantalla_detalle = DetalleHabitoScreen(name='detalle_habito')
+        # Instanciar y registrar pantallas de la aplicación
+        pantallas = [
+            LoginScreen(name='login'),
+            RegisterScreen(name='registro'),
+            InicioScreen(name='inicio'),
+            MetasScreen(name='metas'),
+            RecordatoriosScreen(name='recordatorios'),
+            AsistenteScreen(name='asistente'),
+            DetalleHabitoScreen(name='detalle_habito')
+        ]
         
-        # Inyectar referencia a app en cada controlador
-        pantalla_login.app = self
-        pantalla_registro.app = self
-        pantalla_inicio.app = self
-        pantalla_metas.app = self
-        pantalla_recordatorios.app = self
-        pantalla_asistente.app = self
-        pantalla_detalle.app = self
-        
-        # Registrar en el ScreenManager
-        self.gestor_pantallas.add_widget(pantalla_login)
-        self.gestor_pantallas.add_widget(pantalla_registro)
-        self.gestor_pantallas.add_widget(pantalla_inicio)
-        self.gestor_pantallas.add_widget(pantalla_metas)
-        self.gestor_pantallas.add_widget(pantalla_recordatorios)
-        self.gestor_pantallas.add_widget(pantalla_asistente)
-        self.gestor_pantallas.add_widget(pantalla_detalle)
+        for pantalla in pantallas:
+            pantalla.app = self
+            self.gestor_pantallas.add_widget(pantalla)
         
         return self.gestor_pantallas
     
@@ -103,12 +93,9 @@ class HabitTrackerApp(MDApp):
             'detalle_habito_screen.kv'
         ]
         
+        base_dir = os.path.dirname(os.path.abspath(__file__))
         for kv in archivos_kv:
-            # Buscar en screens/kv/ y fallback a screens/
-            ruta_kv = os.path.join('screens', 'kv', kv)
-            if not os.path.exists(ruta_kv):
-                ruta_kv = os.path.join('screens', kv)
-            
+            ruta_kv = os.path.join(base_dir, 'screens', 'kv', kv)
             if os.path.exists(ruta_kv):
                 Builder.load_file(ruta_kv)
             else:

@@ -3,476 +3,840 @@
 #:import dp kivy.metrics.dp
 
 <HabitCard>:
-    ripple_behavior: True
     size_hint_y: None
-    height: dp(120)
-    padding: dp(14)
-    radius: [dp(12), dp(12), dp(12), dp(12)]
-    md_bg_color: 0.12, 0.16, 0.23, 1
-    elevation: 3
+    height: dp(100)
+    padding: [dp(12), dp(10), dp(12), dp(10)]
+    radius: [dp(16), dp(16), dp(16), dp(16)]
+    md_bg_color: 0.08, 0.11, 0.18, 0.85
+    line_color: 1, 1, 1, 0.10
+    line_width: 1
+    elevation: 4
+    ripple_behavior: False
     
     BoxLayout:
-        orientation: 'vertical'
-        spacing: dp(2)
+        orientation: 'horizontal'
+        spacing: dp(10)
         
-        # Fila superior: Nombre + Objetivo + Menú
+        # Botón Check Rápido (+XP / Completado)
+        MDIconButton:
+            icon: "checkbox-marked-circle" if root.completado_hoy else "checkbox-blank-circle-outline"
+            theme_text_color: "Custom"
+            text_color: (0.16, 0.85, 0.55, 1) if root.completado_hoy else (0.5, 0.55, 0.65, 1)
+            size_hint: None, None
+            size: dp(40), dp(40)
+            pos_hint: {'center_y': 0.5}
+            on_release: root.toggle_check()
+        
+        # Contenido Central: Título, Categoría y Métricas
         BoxLayout:
-            orientation: 'horizontal'
-            size_hint_y: None
-            height: dp(28)
-            spacing: dp(6)
+            orientation: 'vertical'
+            spacing: dp(3)
+            size_hint_x: 0.65
+            pos_hint: {'center_y': 0.5}
             
+            # Categoría Pill + Horario
+            BoxLayout:
+                orientation: 'horizontal'
+                size_hint_y: None
+                height: dp(18)
+                spacing: dp(6)
+                
+                MDLabel:
+                    text: root.categoria.upper()
+                    font_size: "9sp"
+                    bold: True
+                    theme_text_color: "Custom"
+                    text_color: 0.95, 0.2, 0.38, 1
+                    size_hint_x: None
+                    width: dp(65)
+                
+                MDLabel:
+                    text: f"⏰ {root.horario} • {root.objetivo} min"
+                    font_size: "10sp"
+                    theme_text_color: "Custom"
+                    text_color: 0.6, 0.65, 0.75, 1
+            
+            # Nombre del Hábito
             MDLabel:
                 text: root.nombre
                 font_style: "Subtitle1"
                 bold: True
                 theme_text_color: "Custom"
                 text_color: 1, 1, 1, 1
-                size_hint_x: 0.65
+                size_hint_y: None
+                height: dp(22)
                 shorten: True
                 shorten_from: 'right'
             
-            MDLabel:
-                text: f"{root.objetivo} min"
-                font_style: "Caption"
-                bold: True
-                theme_text_color: "Custom"
-                text_color: 0.16, 0.85, 0.55, 1
-                size_hint_x: 0.25
-                halign: "right"
+            # Estadísticas rápidas: Racha y Sesiones
+            BoxLayout:
+                orientation: 'horizontal'
+                size_hint_y: None
+                height: dp(16)
+                spacing: dp(10)
+                
+                MDLabel:
+                    text: f"🔥 Racha: {root.racha}d"
+                    font_size: "10sp"
+                    bold: True
+                    theme_text_color: "Custom"
+                    text_color: 1, 0.65, 0.2, 1
+                
+                MDLabel:
+                    text: f"⚡ {root.sesiones} sesiones ({root.total_min}m)"
+                    font_size: "10sp"
+                    theme_text_color: "Custom"
+                    text_color: 0.55, 0.6, 0.7, 1
+
+        # Botones de Acción Directa: Detalle/Timer, Editar y Eliminar
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: None, None
+            size: dp(32), dp(84)
+            spacing: dp(1)
+            pos_hint: {'center_y': 0.5}
             
             MDIconButton:
-                icon: "dots-vertical"
+                icon: "timer-play-outline"
+                theme_text_color: "Custom"
+                text_color: 0, 0.97, 1, 1
+                size_hint: None, None
+                size: dp(26), dp(26)
+                user_font_size: "18sp"
+                on_release: root.ver_detalle()
+
+            MDIconButton:
+                icon: "pencil-outline"
                 theme_text_color: "Custom"
                 text_color: 0.7, 0.75, 0.85, 1
                 size_hint: None, None
-                size: dp(24), dp(24)
-                padding: dp(2)
-                on_release: root.menu.open()
-        
-        MDLabel:
-            text: root.descripcion if root.descripcion else "Sin descripción"
-            font_style: "Caption"
-            theme_text_color: "Custom"
-            text_color: 0.65, 0.7, 0.8, 1
-            size_hint_y: None
-            height: dp(18)
-            shorten: True
-            shorten_from: 'right'
-        
-        # Métricas del hábito (Sesiones, Racha, Total)
-        GridLayout:
-            cols: 3
-            spacing: dp(6)
-            size_hint_y: None
-            height: dp(42)
+                size: dp(26), dp(26)
+                user_font_size: "17sp"
+                on_release: root.editar_habito()
             
-            # Sesiones
-            BoxLayout:
-                orientation: 'vertical'
-                spacing: 0
-                MDLabel:
-                    text: "Sesiones"
-                    font_style: "Overline"
-                    halign: "center"
-                    theme_text_color: "Custom"
-                    text_color: 0.6, 0.65, 0.75, 1
-                MDLabel:
-                    text: str(root.sesiones)
-                    font_style: "Subtitle1"
-                    bold: True
-                    halign: "center"
-                    theme_text_color: "Custom"
-                    text_color: 0, 0.97, 1, 1
-            
-            # Racha
-            BoxLayout:
-                orientation: 'vertical'
-                spacing: 0
-                MDLabel:
-                    text: "Racha"
-                    font_style: "Overline"
-                    halign: "center"
-                    theme_text_color: "Custom"
-                    text_color: 0.6, 0.65, 0.75, 1
-                MDLabel:
-                    text: f"{root.racha}d"
-                    font_style: "Subtitle1"
-                    bold: True
-                    halign: "center"
-                    theme_text_color: "Custom"
-                    text_color: 1, 0.65, 0, 1
-            
-            # Total Minutos
-            BoxLayout:
-                orientation: 'vertical'
-                spacing: 0
-                MDLabel:
-                    text: "Total"
-                    font_style: "Overline"
-                    halign: "center"
-                    theme_text_color: "Custom"
-                    text_color: 0.6, 0.65, 0.75, 1
-                MDLabel:
-                    text: f"{root.total_min}m"
-                    font_style: "Subtitle1"
-                    bold: True
-                    halign: "center"
-                    theme_text_color: "Custom"
-                    text_color: 0.8, 0.55, 1, 1
-
-<InicioScreen>:
-    FloatLayout:
-        canvas.before:
-            Color:
-                rgba: 0.07, 0.09, 0.13, 1
-            Rectangle:
-                pos: self.pos
-                size: self.size
-        
-        # Header Superior
-        BoxLayout:
-            orientation: 'horizontal'
-            size_hint: 0.92, None
-            height: dp(50)
-            pos_hint: {'center_x': 0.5, 'top': 0.98}
-            
-            BoxLayout:
-                orientation: 'vertical'
-                size_hint_x: 0.75
-                spacing: 0
-                
-                MDLabel:
-                    text: "HabitTracker"
-                    font_style: "H6"
-                    bold: True
-                    theme_text_color: "Custom"
-                    text_color: 0, 0.97, 1, 1
-                
-                MDLabel:
-                    id: bienvenido
-                    text: "¡Hola, Manuel David!"
-                    font_size: "12sp"
-                    theme_text_color: "Custom"
-                    text_color: 0.7, 0.75, 0.85, 1
-            
-            MDRaisedButton:
-                text: "Salir"
-                font_size: "11sp"
+            MDIconButton:
+                icon: "trash-can-outline"
+                theme_text_color: "Custom"
+                text_color: 0.9, 0.3, 0.3, 1
                 size_hint: None, None
-                size: dp(65), dp(32)
-                pos_hint: {'center_y': 0.5}
-                md_bg_color: 0.22, 0.26, 0.35, 1
-                text_color: 1, 1, 1, 1
-                on_release: root.logout()
-        
-        # Barra de progreso general
+                size: dp(26), dp(26)
+                user_font_size: "17sp"
+                on_release: root.eliminar_habito()
+
+<InsigniaCardItem>:
+    size_hint_y: None
+    height: dp(68)
+    radius: [dp(14), dp(14), dp(14), dp(14)]
+    padding: [dp(10), dp(6), dp(10), dp(6)]
+    md_bg_color: (0.10, 0.14, 0.22, 0.95) if root.desbloqueado else (0.07, 0.08, 0.12, 0.85)
+    line_color: (1, 0.75, 0.2, 0.6) if root.desbloqueado else (1, 1, 1, 0.08)
+    line_width: 1.2 if root.desbloqueado else 1
+
+    BoxLayout:
+        orientation: 'horizontal'
+        spacing: dp(10)
+        pos_hint: {'center_y': 0.5}
+
+        # Icono de la insignia
         MDCard:
+            size_hint: None, None
+            size: dp(40), dp(40)
+            radius: [dp(20), dp(20), dp(20), dp(20)]
+            md_bg_color: (root.color_rgba[0], root.color_rgba[1], root.color_rgba[2], 0.2) if root.desbloqueado else (0.12, 0.14, 0.18, 0.9)
+            line_color: root.color_rgba if root.desbloqueado else (0.4, 0.45, 0.55, 0.3)
+            line_width: 1
+            pos_hint: {'center_y': 0.5}
+
+            AnchorLayout:
+                anchor_x: 'center'
+                anchor_y: 'center'
+                MDIcon:
+                    icon: root.icono if root.desbloqueado else "lock"
+                    font_size: "20sp"
+                    halign: "center"
+                    valign: "center"
+                    theme_text_color: "Custom"
+                    text_color: root.color_rgba if root.desbloqueado else (0.45, 0.5, 0.6, 1)
+
+        # Textos: Título, Descripción y Progreso
+        BoxLayout:
             orientation: 'vertical'
-            size_hint: 0.92, None
-            height: dp(64)
-            pos_hint: {'center_x': 0.5, 'top': 0.89}
-            padding: [dp(12), dp(8)]
-            spacing: dp(4)
-            radius: [dp(12), dp(12), dp(12), dp(12)]
-            md_bg_color: 0.12, 0.16, 0.23, 1
-            elevation: 2
-            
+            spacing: dp(2)
+            pos_hint: {'center_y': 0.5}
+
+            BoxLayout:
+                orientation: 'horizontal'
+                size_hint_y: None
+                height: dp(18)
+                spacing: dp(6)
+
+                MDLabel:
+                    text: root.titulo
+                    font_size: "11sp"
+                    bold: True
+                    theme_text_color: "Custom"
+                    text_color: (1, 1, 1, 1) if root.desbloqueado else (0.6, 0.65, 0.75, 1)
+                    shorten: True
+
+                MDLabel:
+                    text: "✓ DESBLOQUEADO" if root.desbloqueado else "BLOQUEADO"
+                    font_size: "8sp"
+                    bold: True
+                    halign: "right"
+                    theme_text_color: "Custom"
+                    text_color: (0.16, 0.85, 0.55, 1) if root.desbloqueado else (0.5, 0.55, 0.65, 1)
+
+            MDLabel:
+                text: root.descripcion
+                font_size: "9sp"
+                theme_text_color: "Custom"
+                text_color: 0.6, 0.65, 0.75, 1
+                size_hint_y: None
+                height: dp(14)
+                shorten: True
+
+            BoxLayout:
+                orientation: 'horizontal'
+                size_hint_y: None
+                height: dp(14)
+                spacing: dp(6)
+
+                MDLabel:
+                    text: root.progreso_texto
+                    font_size: "9sp"
+                    theme_text_color: "Custom"
+                    text_color: (1, 0.8, 0.3, 1) if root.desbloqueado else (0.5, 0.55, 0.65, 1)
+
+                MDLabel:
+                    text: root.xp_texto
+                    font_size: "9sp"
+                    bold: True
+                    halign: "right"
+                    theme_text_color: "Custom"
+                    text_color: 0.95, 0.2, 0.38, 1
+
+<LogrosModalContent>:
+    orientation: 'vertical'
+    spacing: dp(8)
+    size_hint_y: None
+    height: dp(390)
+    padding: [dp(4), dp(4), dp(4), dp(4)]
+
+    # Cabecera RPG de Nivel y Rango
+    MDCard:
+        size_hint_y: None
+        height: dp(76)
+        radius: [dp(14), dp(14), dp(14), dp(14)]
+        md_bg_color: 0.12, 0.08, 0.16, 0.95
+        line_color: 1, 0.8, 0.2, 0.5
+        line_width: 1.2
+        padding: [dp(10), dp(6), dp(10), dp(6)]
+
+        BoxLayout:
+            orientation: 'vertical'
+            spacing: dp(3)
+
             BoxLayout:
                 orientation: 'horizontal'
                 size_hint_y: None
                 height: dp(20)
-                
-                MDLabel:
-                    id: progreso_general_texto
-                    text: "Cumplimiento General Hoy"
-                    font_style: "Caption"
+                spacing: dp(6)
+
+                MDIcon:
+                    id: icono_rango_rpg
+                    icon: "crown"
+                    size_hint: None, None
+                    size: dp(20), dp(20)
                     theme_text_color: "Custom"
-                    text_color: 0.7, 0.75, 0.85, 1
-                    size_hint_x: 0.7
-                
+                    text_color: 1, 0.8, 0.2, 1
+
                 MDLabel:
-                    id: progreso_general_porcentaje
-                    text: "0%"
-                    font_style: "Subtitle2"
+                    id: titulo_rango_rpg
+                    text: "Nivel 3: Maestro HabitPulse"
+                    font_size: "11sp"
+                    bold: True
+                    theme_text_color: "Custom"
+                    text_color: 1, 0.9, 0.5, 1
+
+                MDLabel:
+                    id: conteo_desbloqueadas_texto
+                    text: "3/5 Insignias"
+                    font_size: "10sp"
                     bold: True
                     halign: "right"
                     theme_text_color: "Custom"
                     text_color: 0, 0.97, 1, 1
-                    size_hint_x: 0.3
-            
+
             ProgressBar:
-                id: barra_progreso_general
+                id: barra_nivel_modal
                 max: 100
-                value: 0
+                value: 65
                 size_hint_y: None
-                height: dp(8)
-        
-        # Estadísticas 4 métricas (Sesiones, Tiempo, Racha, Hoy)
-        GridLayout:
-            cols: 4
+                height: dp(6)
+
+            BoxLayout:
+                orientation: 'horizontal'
+                size_hint_y: None
+                height: dp(14)
+
+                MDLabel:
+                    id: xp_progreso_modal
+                    text: "450 / 850 XP Acumulados"
+                    font_size: "9sp"
+                    theme_text_color: "Custom"
+                    text_color: 0.7, 0.75, 0.85, 1
+
+                MDLabel:
+                    id: siguiente_nivel_modal
+                    text: "Próximo: Nivel 4 Titán (+400 XP)"
+                    font_size: "9sp"
+                    halign: "right"
+                    theme_text_color: "Custom"
+                    text_color: 0.95, 0.2, 0.38, 1
+
+    # Lista con Scroll de Insignias
+    ScrollView:
+        effect_cls: ScrollEffect
+        do_scroll_x: False
+        size_hint_y: 1
+
+        BoxLayout:
+            id: contenedor_insignias
+            orientation: 'vertical'
+            spacing: dp(6)
+            size_hint_y: None
+            height: self.minimum_height
+
+<InicioScreen>:
+    FloatLayout:
+        # Fondo oscuro Obsidian con gradiente sutil
+        canvas.before:
+            Color:
+                rgba: 0.04, 0.06, 0.10, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+            Color:
+                rgba: 0.88, 0.11, 0.28, 0.06
+            Ellipse:
+                pos: self.width * 0.1, self.height * 0.70
+                size: self.width * 0.8, self.width * 0.8
+
+        # Contenedor Principal
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: 0.92, 0.89
+            pos_hint: {'center_x': 0.5, 'top': 0.98}
             spacing: dp(8)
-            size_hint: 0.92, None
-            height: dp(62)
-            pos_hint: {'center_x': 0.5, 'top': 0.78}
-            
-            # 1: Sesiones
-            MDCard:
-                radius: [dp(10), dp(10), dp(10), dp(10)]
-                md_bg_color: 0.12, 0.16, 0.23, 1
-                elevation: 1
-                padding: dp(4)
+
+            # 1. Cabecera Branding & Usuario
+            BoxLayout:
+                orientation: 'horizontal'
+                size_hint_y: None
+                height: dp(46)
+                spacing: dp(8)
+                
+                # Avatar circular interactivo (abre Logros RPG)
+                MDCard:
+                    size_hint: None, None
+                    size: dp(42), dp(42)
+                    radius: [dp(21), dp(21), dp(21), dp(21)]
+                    md_bg_color: 0.88, 0.11, 0.28, 0.2
+                    line_color: 0.88, 0.11, 0.28, 0.6
+                    line_width: 1.2
+                    pos_hint: {'center_y': 0.5}
+                    ripple_behavior: True
+                    on_release: root.abrir_logros_dialog()
+                    
+                    AnchorLayout:
+                        anchor_x: 'center'
+                        anchor_y: 'center'
+                        MDIcon:
+                            icon: "lightning-bolt"
+                            font_size: "24sp"
+                            halign: "center"
+                            valign: "center"
+                            theme_text_color: "Custom"
+                            text_color: 1, 0.2, 0.4, 1
+                
+                # Info de Usuario y Nivel
                 BoxLayout:
                     orientation: 'vertical'
                     spacing: 0
+                    pos_hint: {'center_y': 0.5}
+                    
                     MDLabel:
-                        text: "Sesiones"
-                        font_size: "9sp"
-                        halign: "center"
-                        theme_text_color: "Custom"
-                        text_color: 0.6, 0.65, 0.75, 1
-                    MDLabel:
-                        id: sesiones
-                        text: "0"
+                        id: bienvenido
+                        text: "¡Hola, David!"
                         font_style: "Subtitle1"
                         bold: True
-                        halign: "center"
+                        theme_text_color: "Custom"
+                        text_color: 1, 1, 1, 1
+                    
+                    MDLabel:
+                        id: nivel_xp_text
+                        text: "Nvl 3 Maestro • 450 / 600 XP"
+                        font_size: "10sp"
+                        theme_text_color: "Custom"
+                        text_color: 0.95, 0.2, 0.38, 1
+
+                # Badge Racha Fuego
+                MDCard:
+                    size_hint: None, None
+                    size: dp(76), dp(32)
+                    radius: [dp(12), dp(12), dp(12), dp(12)]
+                    md_bg_color: 0.14, 0.10, 0.08, 0.95
+                    line_color: 1, 0.6, 0.1, 0.6
+                    line_width: 1
+                    pos_hint: {'center_y': 0.5}
+                    padding: [dp(6), dp(2), dp(6), dp(2)]
+                    
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        spacing: dp(4)
+                        pos_hint: {'center_y': 0.5}
+                        
+                        AnchorLayout:
+                            size_hint: None, None
+                            size: dp(20), dp(20)
+                            anchor_x: 'center'
+                            anchor_y: 'center'
+                            pos_hint: {'center_y': 0.5}
+                            
+                            MDIcon:
+                                icon: "fire"
+                                font_size: "18sp"
+                                halign: "center"
+                                valign: "center"
+                                theme_text_color: "Custom"
+                                text_color: 1, 0.65, 0.1, 1
+                        
+                        MDLabel:
+                            id: racha_header
+                            text: "4 días"
+                            font_size: "11sp"
+                            bold: True
+                            valign: 'middle'
+                            pos_hint: {'center_y': 0.5}
+                            theme_text_color: "Custom"
+                            text_color: 1, 0.8, 0.3, 1
+
+                # Botón Trofeo Logros RPG
+                MDIconButton:
+                    icon: "trophy-award"
+                    theme_text_color: "Custom"
+                    text_color: 1, 0.8, 0.2, 1
+                    user_font_size: "22sp"
+                    size_hint: None, None
+                    size: dp(36), dp(36)
+                    pos_hint: {'center_y': 0.5}
+                    on_release: root.abrir_logros_dialog()
+
+            # 2. Buscador en Tiempo Real
+            MDCard:
+                size_hint_y: None
+                height: dp(40)
+                radius: [dp(14), dp(14), dp(14), dp(14)]
+                md_bg_color: 0.08, 0.11, 0.18, 0.85
+                line_color: 1, 1, 1, 0.12
+                line_width: 1
+                padding: [dp(10), dp(2), dp(10), dp(2)]
+                
+                BoxLayout:
+                    orientation: 'horizontal'
+                    spacing: dp(6)
+                    MDIcon:
+                        icon: "magnify"
+                        size_hint: None, None
+                        size: dp(22), dp(22)
+                        pos_hint: {'center_y': 0.5}
+                        theme_text_color: "Custom"
+                        text_color: 0.5, 0.55, 0.65, 1
+                    
+                    TextInput:
+                        id: buscador_input
+                        hint_text: "Buscar hábito por nombre o categoría..."
+                        background_color: 0, 0, 0, 0
+                        foreground_color: 1, 1, 1, 1
+                        hint_text_color: 0.5, 0.55, 0.65, 1
+                        cursor_color: 0.88, 0.11, 0.28, 1
+                        font_size: "12sp"
+                        multiline: False
+                        size_hint_y: None
+                        height: dp(32)
+                        pos_hint: {'center_y': 0.5}
+                        on_text: root.filtrar_habitos(self.text)
+
+            # 2.5 Banner Interactivo de Rango e Insignias RPG
+            MDCard:
+                size_hint_y: None
+                height: dp(34)
+                radius: [dp(12), dp(12), dp(12), dp(12)]
+                md_bg_color: 0.12, 0.08, 0.16, 0.92
+                line_color: 1, 0.8, 0.2, 0.35
+                line_width: 1
+                padding: [dp(10), dp(4), dp(10), dp(4)]
+                ripple_behavior: True
+                on_release: root.abrir_logros_dialog()
+                
+                BoxLayout:
+                    orientation: 'horizontal'
+                    spacing: dp(6)
+                    pos_hint: {'center_y': 0.5}
+                    
+                    MDIcon:
+                        icon: "trophy-award"
+                        size_hint: None, None
+                        size: dp(18), dp(18)
+                        font_size: "16sp"
+                        pos_hint: {'center_y': 0.5}
+                        theme_text_color: "Custom"
+                        text_color: 1, 0.8, 0.2, 1
+                    
+                    MDLabel:
+                        id: texto_insignias_banner
+                        text: "Logros RPG: 3/5 Insignias Desbloqueadas"
+                        font_size: "10sp"
+                        bold: True
+                        theme_text_color: "Custom"
+                        text_color: 1, 0.85, 0.4, 1
+                        pos_hint: {'center_y': 0.5}
+                    
+                    MDLabel:
+                        text: "Insignias ›"
+                        font_size: "10sp"
+                        bold: True
+                        halign: "right"
                         theme_text_color: "Custom"
                         text_color: 0, 0.97, 1, 1
-            
-            # 2: Tiempo
+                        pos_hint: {'center_y': 0.5}
+
+            # 3. Cumplimiento General y Semana
             MDCard:
-                radius: [dp(10), dp(10), dp(10), dp(10)]
-                md_bg_color: 0.12, 0.16, 0.23, 1
-                elevation: 1
-                padding: dp(4)
+                orientation: 'vertical'
+                size_hint_y: None
+                height: dp(76)
+                radius: [dp(16), dp(16), dp(16), dp(16)]
+                padding: [dp(12), dp(8), dp(12), dp(8)]
+                spacing: dp(4)
+                md_bg_color: 0.08, 0.11, 0.18, 0.85
+                line_color: 1, 1, 1, 0.10
+                line_width: 1
+
                 BoxLayout:
-                    orientation: 'vertical'
-                    spacing: 0
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: dp(20)
+                    
                     MDLabel:
-                        text: "Minutos"
-                        font_size: "9sp"
-                        halign: "center"
-                        theme_text_color: "Custom"
-                        text_color: 0.6, 0.65, 0.75, 1
-                    MDLabel:
-                        id: tiempo
-                        text: "0"
-                        font_style: "Subtitle1"
+                        text: "Progreso Semanal HabitPulse"
+                        font_size: "11sp"
                         bold: True
-                        halign: "center"
                         theme_text_color: "Custom"
-                        text_color: 0.8, 0.55, 1, 1
-            
-            # 3: Racha
-            MDCard:
-                radius: [dp(10), dp(10), dp(10), dp(10)]
-                md_bg_color: 0.12, 0.16, 0.23, 1
-                elevation: 1
-                padding: dp(4)
-                BoxLayout:
-                    orientation: 'vertical'
-                    spacing: 0
+                        text_color: 0.7, 0.75, 0.85, 1
+                    
                     MDLabel:
-                        text: "Racha"
-                        font_size: "9sp"
-                        halign: "center"
-                        theme_text_color: "Custom"
-                        text_color: 0.6, 0.65, 0.75, 1
-                    MDLabel:
-                        id: racha
-                        text: "0"
-                        font_style: "Subtitle1"
+                        id: progreso_general_porcentaje
+                        text: "75%"
+                        font_size: "12sp"
                         bold: True
-                        halign: "center"
+                        halign: "right"
                         theme_text_color: "Custom"
-                        text_color: 1, 0.65, 0, 1
-            
-            # 4: Hoy
-            MDCard:
-                radius: [dp(10), dp(10), dp(10), dp(10)]
-                md_bg_color: 0.12, 0.16, 0.23, 1
-                elevation: 1
-                padding: dp(4)
+                        text_color: 0.88, 0.11, 0.28, 1
+
+                ProgressBar:
+                    id: barra_progreso_general
+                    max: 100
+                    value: 75
+                    size_hint_y: None
+                    height: dp(6)
+
+                # Días de la semana [L, M, M, J, V, S, D]
                 BoxLayout:
-                    orientation: 'vertical'
-                    spacing: 0
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: dp(24)
+                    spacing: dp(4)
+                    
                     MDLabel:
-                        text: "Hoy (m)"
-                        font_size: "9sp"
-                        halign: "center"
-                        theme_text_color: "Custom"
-                        text_color: 0.6, 0.65, 0.75, 1
-                    MDLabel:
-                        id: hoy
-                        text: "0"
-                        font_style: "Subtitle1"
+                        text: "L ✓"
+                        font_size: "10sp"
                         bold: True
                         halign: "center"
                         theme_text_color: "Custom"
                         text_color: 0.16, 0.85, 0.55, 1
+                    MDLabel:
+                        text: "M ✓"
+                        font_size: "10sp"
+                        bold: True
+                        halign: "center"
+                        theme_text_color: "Custom"
+                        text_color: 0.16, 0.85, 0.55, 1
+                    MDLabel:
+                        text: "X ✓"
+                        font_size: "10sp"
+                        bold: True
+                        halign: "center"
+                        theme_text_color: "Custom"
+                        text_color: 0.16, 0.85, 0.55, 1
+                    MDLabel:
+                        text: "J ✓"
+                        font_size: "10sp"
+                        bold: True
+                        halign: "center"
+                        theme_text_color: "Custom"
+                        text_color: 0.16, 0.85, 0.55, 1
+                    MDLabel:
+                        text: "V ○"
+                        font_size: "10sp"
+                        bold: True
+                        halign: "center"
+                        theme_text_color: "Custom"
+                        text_color: 0.88, 0.11, 0.28, 1
+                    MDLabel:
+                        text: "S -"
+                        font_size: "10sp"
+                        halign: "center"
+                        theme_text_color: "Custom"
+                        text_color: 0.5, 0.55, 0.65, 1
+                    MDLabel:
+                        text: "D -"
+                        font_size: "10sp"
+                        halign: "center"
+                        theme_text_color: "Custom"
+                        text_color: 0.5, 0.55, 0.65, 1
 
-        # Banner Inteligente de Asistente IA (Acceso Rápido)
-        MDCard:
-            size_hint: 0.92, None
-            height: dp(38)
-            pos_hint: {'center_x': 0.5, 'top': 0.67}
-            radius: [dp(10), dp(10), dp(10), dp(10)]
-            md_bg_color: 0.20, 0.14, 0.18, 1
-            padding: [dp(8), dp(4)]
-            elevation: 1
-            ripple_behavior: True
-            on_release: root.app.cambiar_pantalla('asistente', 'left')
+            # 4. Métricas Rápidas (Sesiones, Minutos, Racha, Hoy)
+            GridLayout:
+                cols: 4
+                spacing: dp(6)
+                size_hint_y: None
+                height: dp(48)
+                
+                MDCard:
+                    radius: [dp(12), dp(12), dp(12), dp(12)]
+                    md_bg_color: 0.08, 0.11, 0.18, 0.80
+                    padding: dp(2)
+                    BoxLayout:
+                        orientation: 'vertical'
+                        MDLabel:
+                            text: "Sesiones"
+                            font_size: "9sp"
+                            halign: "center"
+                            theme_text_color: "Custom"
+                            text_color: 0.6, 0.65, 0.75, 1
+                        MDLabel:
+                            id: sesiones
+                            text: "9"
+                            font_size: "13sp"
+                            bold: True
+                            halign: "center"
+                            theme_text_color: "Custom"
+                            text_color: 0.16, 0.85, 0.55, 1
 
+                MDCard:
+                    radius: [dp(12), dp(12), dp(12), dp(12)]
+                    md_bg_color: 0.08, 0.11, 0.18, 0.80
+                    padding: dp(2)
+                    BoxLayout:
+                        orientation: 'vertical'
+                        MDLabel:
+                            text: "Minutos"
+                            font_size: "9sp"
+                            halign: "center"
+                            theme_text_color: "Custom"
+                            text_color: 0.6, 0.65, 0.75, 1
+                        MDLabel:
+                            id: tiempo
+                            text: "120"
+                            font_size: "13sp"
+                            bold: True
+                            halign: "center"
+                            theme_text_color: "Custom"
+                            text_color: 0.88, 0.11, 0.28, 1
+
+                MDCard:
+                    radius: [dp(12), dp(12), dp(12), dp(12)]
+                    md_bg_color: 0.08, 0.11, 0.18, 0.80
+                    padding: dp(2)
+                    BoxLayout:
+                        orientation: 'vertical'
+                        MDLabel:
+                            text: "Racha"
+                            font_size: "9sp"
+                            halign: "center"
+                            theme_text_color: "Custom"
+                            text_color: 0.6, 0.65, 0.75, 1
+                        MDLabel:
+                            id: racha
+                            text: "4d"
+                            font_size: "13sp"
+                            bold: True
+                            halign: "center"
+                            theme_text_color: "Custom"
+                            text_color: 1, 0.65, 0.2, 1
+
+                MDCard:
+                    radius: [dp(12), dp(12), dp(12), dp(12)]
+                    md_bg_color: 0.08, 0.11, 0.18, 0.80
+                    padding: dp(2)
+                    BoxLayout:
+                        orientation: 'vertical'
+                        MDLabel:
+                            text: "Hoy"
+                            font_size: "9sp"
+                            halign: "center"
+                            theme_text_color: "Custom"
+                            text_color: 0.6, 0.65, 0.75, 1
+                        MDLabel:
+                            id: hoy
+                            text: "25m"
+                            font_size: "13sp"
+                            bold: True
+                            halign: "center"
+                            theme_text_color: "Custom"
+                            text_color: 0.35, 0.65, 1, 1
+
+            # 5. Encabezado de la lista + Botón Nuevo Hábito
             BoxLayout:
                 orientation: 'horizontal'
-                spacing: dp(6)
-                
-                MDIconButton:
-                    icon: "robot"
-                    theme_text_color: "Custom"
-                    text_color: 1, 0.4, 0.4, 1
-                    size_hint: None, None
-                    size: dp(24), dp(24)
-                    padding: dp(2)
+                size_hint_y: None
+                height: dp(30)
                 
                 MDLabel:
-                    text: "🤖 Asistente: 1 hábito en riesgo (<50%). Toca para auditar."
-                    font_size: "10sp"
+                    id: habitos_titulo
+                    text: "Hábitos Activos"
+                    font_style: "Subtitle2"
                     bold: True
                     theme_text_color: "Custom"
-                    text_color: 1, 0.85, 0.7, 1
-                    shorten: True
-                    shorten_from: 'right'
+                    text_color: 1, 1, 1, 1
                 
-                MDIconButton:
-                    icon: "chevron-right"
-                    theme_text_color: "Custom"
-                    text_color: 1, 0.85, 0.7, 1
+                MDFillRoundFlatButton:
+                    text: "+ Nuevo Hábito"
+                    font_size: "11sp"
+                    bold: True
                     size_hint: None, None
-                    size: dp(20), dp(20)
-                    padding: dp(2)
+                    size: dp(110), dp(28)
+                    pos_hint: {'center_y': 0.5}
+                    md_bg_color: 0.88, 0.11, 0.28, 1
+                    text_color: 1, 1, 1, 1
+                    on_release: root.add_new_habit()
 
-        # Encabezado lista de hábitos y botón agregar
-        BoxLayout:
-            orientation: 'horizontal'
-            size_hint: 0.92, None
-            height: dp(30)
-            pos_hint: {'center_x': 0.5, 'top': 0.60}
-            
-            MDLabel:
-                text: "Mis Hábitos Activos"
-                font_style: "Subtitle2"
-                bold: True
-                theme_text_color: "Custom"
-                text_color: 1, 1, 1, 1
-                size_hint_x: 0.65
-            
-            MDFillRoundFlatButton:
-                text: "+ Hábito"
-                font_size: "11sp"
-                size_hint: None, None
-                size: dp(85), dp(28)
-                pos_hint: {'center_y': 0.5}
-                md_bg_color: 0.1, 0.55, 0.9, 1
-                text_color: 1, 1, 1, 1
-                on_release: root.add_new_habit()
+            # 6. Lista de Hábitos (ScrollView)
+            ScrollView:
+                id: habits_scroll
+                size_hint_y: 1
+                effect_cls: ScrollEffect
+                
+                GridLayout:
+                    id: habits_container
+                    cols: 1
+                    size_hint_y: None
+                    height: self.minimum_height
+                    spacing: dp(8)
+                    padding: [0, dp(2), 0, dp(14)]
 
-        # Lista de Hábitos (ScrollView)
-        ScrollView:
-            size_hint: 0.92, 0.43
-            pos_hint: {'center_x': 0.5, 'y': 0.11}
-            effect_cls: ScrollEffect
-            
-            GridLayout:
-                id: habits_container
-                cols: 1
-                size_hint_y: None
-                height: self.minimum_height
-                spacing: dp(10)
-                padding: [0, dp(4), 0, dp(20)]
-
-        # Barra de Navegación Inferior Móvil
+        # 7. Barra de Navegación Flotante Inferior (Dock Moderno)
         MDCard:
-            size_hint: 1, None
-            height: dp(56)
-            pos_hint: {'bottom': 1, 'center_x': 0.5}
-            md_bg_color: 0.10, 0.13, 0.18, 1
-            elevation: 8
-            radius: [dp(14), dp(14), 0, 0]
-            padding: [dp(4), dp(2)]
+            size_hint: 0.94, None
+            height: dp(54)
+            pos_hint: {'center_x': 0.5, 'y': 0.015}
+            md_bg_color: 0.08, 0.11, 0.18, 0.92
+            line_color: 1, 1, 1, 0.15
+            line_width: 1
+            elevation: 12
+            radius: [dp(22), dp(22), dp(22), dp(22)]
+            padding: [dp(6), dp(2), dp(6), dp(2)]
 
             BoxLayout:
                 orientation: 'horizontal'
 
-                # Tab 1: Inicio (Activo)
+                # 1: Hábitos (Activo)
                 BoxLayout:
                     orientation: 'vertical'
-                    size_hint_x: 0.25
                     spacing: 0
                     MDIconButton:
                         icon: "view-dashboard"
                         theme_text_color: "Custom"
-                        text_color: 0, 0.97, 1, 1
+                        text_color: 0.88, 0.11, 0.28, 1
                         pos_hint: {'center_x': 0.5}
+                        user_font_size: "20sp"
                     MDLabel:
-                        text: "Hábitos"
+                        text: "Inicio"
                         font_size: "9sp"
                         bold: True
                         halign: "center"
                         theme_text_color: "Custom"
-                        text_color: 0, 0.97, 1, 1
+                        text_color: 0.88, 0.11, 0.28, 1
 
-                # Tab 2: Metas
+                # 2: Metas
                 BoxLayout:
                     orientation: 'vertical'
-                    size_hint_x: 0.25
                     spacing: 0
                     MDIconButton:
                         icon: "target"
                         theme_text_color: "Custom"
-                        text_color: 0.5, 0.55, 0.65, 1
+                        text_color: 0.55, 0.6, 0.7, 1
                         pos_hint: {'center_x': 0.5}
+                        user_font_size: "20sp"
                         on_release: root.app.cambiar_pantalla('metas', 'left')
                     MDLabel:
                         text: "Metas"
                         font_size: "9sp"
                         halign: "center"
                         theme_text_color: "Custom"
-                        text_color: 0.5, 0.55, 0.65, 1
+                        text_color: 0.55, 0.6, 0.7, 1
 
-                # Tab 3: Recordatorios
+                # 3: Asistente
                 BoxLayout:
                     orientation: 'vertical'
-                    size_hint_x: 0.25
-                    spacing: 0
-                    MDIconButton:
-                        icon: "bell-ring"
-                        theme_text_color: "Custom"
-                        text_color: 0.5, 0.55, 0.65, 1
-                        pos_hint: {'center_x': 0.5}
-                        on_release: root.app.cambiar_pantalla('recordatorios', 'left')
-                    MDLabel:
-                        text: "Horarios"
-                        font_size: "9sp"
-                        halign: "center"
-                        theme_text_color: "Custom"
-                        text_color: 0.5, 0.55, 0.65, 1
-
-                # Tab 4: Asistente
-                BoxLayout:
-                    orientation: 'vertical'
-                    size_hint_x: 0.25
                     spacing: 0
                     MDIconButton:
                         icon: "robot"
                         theme_text_color: "Custom"
-                        text_color: 0.5, 0.55, 0.65, 1
+                        text_color: 0.55, 0.6, 0.7, 1
                         pos_hint: {'center_x': 0.5}
+                        user_font_size: "20sp"
                         on_release: root.app.cambiar_pantalla('asistente', 'left')
                     MDLabel:
                         text: "Asistente"
                         font_size: "9sp"
                         halign: "center"
                         theme_text_color: "Custom"
-                        text_color: 0.5, 0.55, 0.65, 1
+                        text_color: 0.55, 0.6, 0.7, 1
+
+                # 4: Horarios
+                BoxLayout:
+                    orientation: 'vertical'
+                    spacing: 0
+                    MDIconButton:
+                        icon: "bell-ring"
+                        theme_text_color: "Custom"
+                        text_color: 0.55, 0.6, 0.7, 1
+                        pos_hint: {'center_x': 0.5}
+                        user_font_size: "20sp"
+                        on_release: root.app.cambiar_pantalla('recordatorios', 'left')
+                    MDLabel:
+                        text: "Horarios"
+                        font_size: "9sp"
+                        halign: "center"
+                        theme_text_color: "Custom"
+                        text_color: 0.55, 0.6, 0.7, 1
+
+                # 5: Perfil
+                BoxLayout:
+                    orientation: 'vertical'
+                    spacing: 0
+                    MDIconButton:
+                        icon: "account-circle"
+                        theme_text_color: "Custom"
+                        text_color: 0.55, 0.6, 0.7, 1
+                        pos_hint: {'center_x': 0.5}
+                        user_font_size: "20sp"
+                        on_release: root.abrir_perfil_dialog()
+                    MDLabel:
+                        text: "Perfil"
+                        font_size: "9sp"
+                        halign: "center"
+                        theme_text_color: "Custom"
+                        text_color: 0.55, 0.6, 0.7, 1
