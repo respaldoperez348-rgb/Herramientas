@@ -7,10 +7,10 @@
     height: dp(100)
     padding: [dp(12), dp(10), dp(12), dp(10)]
     radius: [dp(16), dp(16), dp(16), dp(16)]
-    md_bg_color: 0.08, 0.11, 0.18, 0.85
-    line_color: 1, 1, 1, 0.10
+    md_bg_color: app.card_bg
+    line_color: app.card_border
     line_width: 1
-    elevation: 4
+    elevation: 3
     ripple_behavior: False
     
     BoxLayout:
@@ -62,7 +62,7 @@
                 font_style: "Subtitle1"
                 bold: True
                 theme_text_color: "Custom"
-                text_color: 1, 1, 1, 1
+                text_color: app.text_primary
                 size_hint_y: None
                 height: dp(22)
                 shorten: True
@@ -215,6 +215,7 @@
                     theme_text_color: "Custom"
                     text_color: 0.95, 0.2, 0.38, 1
 
+
 <LogrosModalContent>:
     orientation: 'vertical'
     spacing: dp(8)
@@ -309,15 +310,15 @@
 
 <InicioScreen>:
     FloatLayout:
-        # Fondo oscuro Obsidian con gradiente sutil
+        # Fondo reactivo al modo oscuro / claro
         canvas.before:
             Color:
-                rgba: 0.04, 0.06, 0.10, 1
+                rgba: app.bg_app
             Rectangle:
                 pos: self.pos
                 size: self.size
             Color:
-                rgba: 0.88, 0.11, 0.28, 0.06
+                rgba: app.color_acento[0], app.color_acento[1], app.color_acento[2], 0.04
             Ellipse:
                 pos: self.width * 0.1, self.height * 0.70
                 size: self.width * 0.8, self.width * 0.8
@@ -336,28 +337,31 @@
                 height: dp(46)
                 spacing: dp(8)
                 
-                # Avatar circular interactivo (abre Logros RPG)
+                # Avatar circular interactivo (abre Perfil y Configuración)
                 MDCard:
                     size_hint: None, None
                     size: dp(42), dp(42)
                     radius: [dp(21), dp(21), dp(21), dp(21)]
-                    md_bg_color: 0.88, 0.11, 0.28, 0.2
-                    line_color: 0.88, 0.11, 0.28, 0.6
-                    line_width: 1.2
+                    md_bg_color: app.card_bg
+                    line_color: app.color_acento
+                    line_width: 1.4
                     pos_hint: {'center_y': 0.5}
                     ripple_behavior: True
-                    on_release: root.abrir_logros_dialog()
+                    on_release: root.ir_a_perfil()
                     
                     AnchorLayout:
                         anchor_x: 'center'
                         anchor_y: 'center'
                         MDIcon:
-                            icon: "lightning-bolt"
+                            id: avatar_icon
+                            icon: root.avatar_icono
                             font_size: "24sp"
+                            size_hint: None, None
+                            size: dp(24), dp(24)
                             halign: "center"
                             valign: "center"
                             theme_text_color: "Custom"
-                            text_color: 1, 0.2, 0.4, 1
+                            text_color: app.color_acento
                 
                 # Info de Usuario y Nivel
                 BoxLayout:
@@ -371,14 +375,14 @@
                         font_style: "Subtitle1"
                         bold: True
                         theme_text_color: "Custom"
-                        text_color: 1, 1, 1, 1
+                        text_color: app.text_primary
                     
                     MDLabel:
                         id: nivel_xp_text
                         text: "Nvl 3 Maestro • 450 / 600 XP"
                         font_size: "10sp"
                         theme_text_color: "Custom"
-                        text_color: 0.95, 0.2, 0.38, 1
+                        text_color: app.color_acento
 
                 # Badge Racha Fuego
                 MDCard:
@@ -437,8 +441,8 @@
                 size_hint_y: None
                 height: dp(40)
                 radius: [dp(14), dp(14), dp(14), dp(14)]
-                md_bg_color: 0.08, 0.11, 0.18, 0.85
-                line_color: 1, 1, 1, 0.12
+                md_bg_color: app.card_bg
+                line_color: app.card_border
                 line_width: 1
                 padding: [dp(10), dp(2), dp(10), dp(2)]
                 
@@ -451,15 +455,15 @@
                         size: dp(22), dp(22)
                         pos_hint: {'center_y': 0.5}
                         theme_text_color: "Custom"
-                        text_color: 0.5, 0.55, 0.65, 1
+                        text_color: app.text_secondary
                     
                     TextInput:
                         id: buscador_input
                         hint_text: "Buscar hábito por nombre o categoría..."
                         background_color: 0, 0, 0, 0
-                        foreground_color: 1, 1, 1, 1
-                        hint_text_color: 0.5, 0.55, 0.65, 1
-                        cursor_color: 0.88, 0.11, 0.28, 1
+                        foreground_color: app.text_primary
+                        hint_text_color: app.text_secondary
+                        cursor_color: app.color_acento
                         font_size: "12sp"
                         multiline: False
                         size_hint_y: None
@@ -519,8 +523,8 @@
                 radius: [dp(16), dp(16), dp(16), dp(16)]
                 padding: [dp(12), dp(8), dp(12), dp(8)]
                 spacing: dp(4)
-                md_bg_color: 0.08, 0.11, 0.18, 0.85
-                line_color: 1, 1, 1, 0.10
+                md_bg_color: app.card_bg
+                line_color: app.card_border
                 line_width: 1
 
                 BoxLayout:
@@ -533,7 +537,7 @@
                         font_size: "11sp"
                         bold: True
                         theme_text_color: "Custom"
-                        text_color: 0.7, 0.75, 0.85, 1
+                        text_color: app.text_secondary
                     
                     MDLabel:
                         id: progreso_general_porcentaje
@@ -542,7 +546,7 @@
                         bold: True
                         halign: "right"
                         theme_text_color: "Custom"
-                        text_color: 0.88, 0.11, 0.28, 1
+                        text_color: app.color_acento
 
                 ProgressBar:
                     id: barra_progreso_general
@@ -615,7 +619,9 @@
                 
                 MDCard:
                     radius: [dp(12), dp(12), dp(12), dp(12)]
-                    md_bg_color: 0.08, 0.11, 0.18, 0.80
+                    md_bg_color: app.card_bg
+                    line_color: app.card_border
+                    line_width: 1
                     padding: dp(2)
                     BoxLayout:
                         orientation: 'vertical'
@@ -624,7 +630,7 @@
                             font_size: "9sp"
                             halign: "center"
                             theme_text_color: "Custom"
-                            text_color: 0.6, 0.65, 0.75, 1
+                            text_color: app.text_secondary
                         MDLabel:
                             id: sesiones
                             text: "9"
@@ -632,11 +638,13 @@
                             bold: True
                             halign: "center"
                             theme_text_color: "Custom"
-                            text_color: 0.16, 0.85, 0.55, 1
+                            text_color: app.text_primary
 
                 MDCard:
                     radius: [dp(12), dp(12), dp(12), dp(12)]
-                    md_bg_color: 0.08, 0.11, 0.18, 0.80
+                    md_bg_color: app.card_bg
+                    line_color: app.card_border
+                    line_width: 1
                     padding: dp(2)
                     BoxLayout:
                         orientation: 'vertical'
@@ -645,7 +653,7 @@
                             font_size: "9sp"
                             halign: "center"
                             theme_text_color: "Custom"
-                            text_color: 0.6, 0.65, 0.75, 1
+                            text_color: app.text_secondary
                         MDLabel:
                             id: tiempo
                             text: "120"
@@ -653,11 +661,13 @@
                             bold: True
                             halign: "center"
                             theme_text_color: "Custom"
-                            text_color: 0.88, 0.11, 0.28, 1
+                            text_color: app.color_acento
 
                 MDCard:
                     radius: [dp(12), dp(12), dp(12), dp(12)]
-                    md_bg_color: 0.08, 0.11, 0.18, 0.80
+                    md_bg_color: app.card_bg
+                    line_color: app.card_border
+                    line_width: 1
                     padding: dp(2)
                     BoxLayout:
                         orientation: 'vertical'
@@ -666,7 +676,7 @@
                             font_size: "9sp"
                             halign: "center"
                             theme_text_color: "Custom"
-                            text_color: 0.6, 0.65, 0.75, 1
+                            text_color: app.text_secondary
                         MDLabel:
                             id: racha
                             text: "4d"
@@ -674,11 +684,13 @@
                             bold: True
                             halign: "center"
                             theme_text_color: "Custom"
-                            text_color: 1, 0.65, 0.2, 1
+                            text_color: app.text_primary
 
                 MDCard:
                     radius: [dp(12), dp(12), dp(12), dp(12)]
-                    md_bg_color: 0.08, 0.11, 0.18, 0.80
+                    md_bg_color: app.card_bg
+                    line_color: app.card_border
+                    line_width: 1
                     padding: dp(2)
                     BoxLayout:
                         orientation: 'vertical'
@@ -687,7 +699,7 @@
                             font_size: "9sp"
                             halign: "center"
                             theme_text_color: "Custom"
-                            text_color: 0.6, 0.65, 0.75, 1
+                            text_color: app.text_secondary
                         MDLabel:
                             id: hoy
                             text: "25m"
@@ -695,7 +707,7 @@
                             bold: True
                             halign: "center"
                             theme_text_color: "Custom"
-                            text_color: 0.35, 0.65, 1, 1
+                            text_color: app.color_acento
 
             # 5. Encabezado de la lista + Botón Nuevo Hábito
             BoxLayout:
@@ -709,7 +721,7 @@
                     font_style: "Subtitle2"
                     bold: True
                     theme_text_color: "Custom"
-                    text_color: 1, 1, 1, 1
+                    text_color: app.text_primary
                 
                 MDFillRoundFlatButton:
                     text: "+ Nuevo Hábito"
@@ -718,7 +730,7 @@
                     size_hint: None, None
                     size: dp(110), dp(28)
                     pos_hint: {'center_y': 0.5}
-                    md_bg_color: 0.88, 0.11, 0.28, 1
+                    md_bg_color: app.color_acento
                     text_color: 1, 1, 1, 1
                     on_release: root.add_new_habit()
 
@@ -741,8 +753,8 @@
             size_hint: 0.94, None
             height: dp(54)
             pos_hint: {'center_x': 0.5, 'y': 0.015}
-            md_bg_color: 0.08, 0.11, 0.18, 0.92
-            line_color: 1, 1, 1, 0.15
+            md_bg_color: app.nav_bg
+            line_color: app.card_border
             line_width: 1
             elevation: 12
             radius: [dp(22), dp(22), dp(22), dp(22)]
@@ -758,7 +770,7 @@
                     MDIconButton:
                         icon: "view-dashboard"
                         theme_text_color: "Custom"
-                        text_color: 0.88, 0.11, 0.28, 1
+                        text_color: app.color_acento
                         pos_hint: {'center_x': 0.5}
                         user_font_size: "20sp"
                     MDLabel:
@@ -767,7 +779,7 @@
                         bold: True
                         halign: "center"
                         theme_text_color: "Custom"
-                        text_color: 0.88, 0.11, 0.28, 1
+                        text_color: app.color_acento
 
                 # 2: Metas
                 BoxLayout:
@@ -776,7 +788,7 @@
                     MDIconButton:
                         icon: "target"
                         theme_text_color: "Custom"
-                        text_color: 0.55, 0.6, 0.7, 1
+                        text_color: app.text_secondary
                         pos_hint: {'center_x': 0.5}
                         user_font_size: "20sp"
                         on_release: root.app.cambiar_pantalla('metas', 'left')
@@ -785,7 +797,7 @@
                         font_size: "9sp"
                         halign: "center"
                         theme_text_color: "Custom"
-                        text_color: 0.55, 0.6, 0.7, 1
+                        text_color: app.text_secondary
 
                 # 3: Asistente
                 BoxLayout:
@@ -794,7 +806,7 @@
                     MDIconButton:
                         icon: "robot"
                         theme_text_color: "Custom"
-                        text_color: 0.55, 0.6, 0.7, 1
+                        text_color: app.text_secondary
                         pos_hint: {'center_x': 0.5}
                         user_font_size: "20sp"
                         on_release: root.app.cambiar_pantalla('asistente', 'left')
@@ -803,7 +815,7 @@
                         font_size: "9sp"
                         halign: "center"
                         theme_text_color: "Custom"
-                        text_color: 0.55, 0.6, 0.7, 1
+                        text_color: app.text_secondary
 
                 # 4: Horarios
                 BoxLayout:
@@ -812,7 +824,7 @@
                     MDIconButton:
                         icon: "bell-ring"
                         theme_text_color: "Custom"
-                        text_color: 0.55, 0.6, 0.7, 1
+                        text_color: app.text_secondary
                         pos_hint: {'center_x': 0.5}
                         user_font_size: "20sp"
                         on_release: root.app.cambiar_pantalla('recordatorios', 'left')
@@ -821,7 +833,7 @@
                         font_size: "9sp"
                         halign: "center"
                         theme_text_color: "Custom"
-                        text_color: 0.55, 0.6, 0.7, 1
+                        text_color: app.text_secondary
 
                 # 5: Perfil
                 BoxLayout:
@@ -830,13 +842,13 @@
                     MDIconButton:
                         icon: "account-circle"
                         theme_text_color: "Custom"
-                        text_color: 0.55, 0.6, 0.7, 1
+                        text_color: app.text_secondary
                         pos_hint: {'center_x': 0.5}
                         user_font_size: "20sp"
-                        on_release: root.abrir_perfil_dialog()
+                        on_release: root.ir_a_perfil()
                     MDLabel:
                         text: "Perfil"
                         font_size: "9sp"
                         halign: "center"
                         theme_text_color: "Custom"
-                        text_color: 0.55, 0.6, 0.7, 1
+                        text_color: app.text_secondary

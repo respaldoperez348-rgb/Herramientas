@@ -256,6 +256,8 @@ class InicioScreen(MDScreen):
         }
     ]
 
+    avatar_icono = StringProperty("lightning-bolt")
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.app = None
@@ -265,22 +267,32 @@ class InicioScreen(MDScreen):
         self._insignias_desbloqueadas_previas = set()
         self._notificacion_mostrada = set()
 
+    def ir_a_perfil(self):
+        if self.app:
+            self.app.cambiar_pantalla('perfil', direccion='left')
+
     def on_pre_enter(self):
         if not self.app or not getattr(self.app, 'usuario_actual', None):
             if self.app:
                 self.app.usuario_actual = {
                     "id": 1,
                     "id_usuario": 1,
-                    "nombre_usuario": "David",
-                    "email": "david.tineo@email.com"
+                    "nombre_usuario": "David.tineo",
+                    "email": "david.tineo@email.com",
+                    "avatar": "lightning-bolt"
                 }
 
         if self.app and self.app.usuario_actual:
             self.current_user_id = self.app.usuario_actual.get("id") or self.app.usuario_actual.get("id_usuario", 1)
-            username = self.app.usuario_actual.get("nombre_usuario") or self.app.usuario_actual.get("nombre", "David")
+            username = self.app.usuario_actual.get("nombre_usuario") or self.app.usuario_actual.get("nombre", "David.tineo")
+            avatar = self.app.usuario_actual.get("avatar", "lightning-bolt")
+            self.avatar_icono = avatar
 
             if hasattr(self.ids, 'bienvenido'):
                 self.ids.bienvenido.text = f"¡Hola, {username}!"
+
+            if hasattr(self.ids, 'avatar_icon'):
+                self.ids.avatar_icon.icon = avatar
 
             self.cargar_estadisticas()
             self.calcular_progreso_general()
@@ -548,26 +560,7 @@ class InicioScreen(MDScreen):
         self.load_habits()
 
     def abrir_perfil_dialog(self):
-        usuario_info = self.app.usuario_actual if self.app else {}
-        form = PerfilForm(usuario_info=usuario_info, habitos_list=self._habitos_demo)
-        self.dialog = MDDialog(
-            title="Perfil de Usuario & Ajustes",
-            type="custom",
-            content_cls=form,
-            buttons=[
-                MDFlatButton(
-                    text="Cerrar",
-                    on_release=lambda x: self.dialog.dismiss()
-                ),
-                MDRaisedButton(
-                    text="Cerrar Sesión",
-                    md_bg_color=(0.88, 0.11, 0.28, 1),
-                    on_release=lambda x: self.cerrar_sesion_desde_perfil()
-                )
-            ],
-            size_hint=(0.9, None)
-        )
-        self.dialog.open()
+        self.ir_a_perfil()
 
     def abrir_logros_dialog(self):
         minutos_totales = sum((h.get('total_segundos', 0) // 60) for h in self._habitos_demo)

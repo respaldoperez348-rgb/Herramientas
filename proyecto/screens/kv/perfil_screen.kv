@@ -1,0 +1,511 @@
+#:kivy 2.0.0
+#:import dp kivy.metrics.dp
+#:import ScrollEffect kivy.effects.scroll.ScrollEffect
+
+<SettingsActionRow@MDCard>:
+    titulo: ""
+    subtitulo: ""
+    icono: "help-circle-outline"
+    color_icono: app.color_acento
+    es_destructivo: False
+    size_hint_y: None
+    height: dp(56)
+    radius: [dp(12), dp(12), dp(12), dp(12)]
+    md_bg_color: app.card_item_bg
+    line_color: (0.85, 0.25, 0.25, 0.3) if self.es_destructivo else app.card_border
+    line_width: 1
+    elevation: 0
+    ripple_behavior: True
+    padding: [dp(12), dp(8), dp(12), dp(8)]
+
+    BoxLayout:
+        orientation: 'horizontal'
+        spacing: dp(12)
+        pos_hint: {'center_y': 0.5}
+
+        # Contenedor del ícono
+        MDCard:
+            size_hint: None, None
+            size: dp(34), dp(34)
+            radius: [dp(8), dp(8), dp(8), dp(8)]
+            md_bg_color: (0.35, 0.1, 0.12, 0.5) if root.es_destructivo else (app.color_acento[0], app.color_acento[1], app.color_acento[2], 0.14)
+            line_color: (0.85, 0.25, 0.25, 0.2) if root.es_destructivo else (app.color_acento[0], app.color_acento[1], app.color_acento[2], 0.25)
+            line_width: 1
+            pos_hint: {'center_y': 0.5}
+
+            AnchorLayout:
+                anchor_x: 'center'
+                anchor_y: 'center'
+                MDIcon:
+                    icon: root.icono
+                    font_size: "18sp"
+                    size_hint: None, None
+                    size: dp(18), dp(18)
+                    halign: 'center'
+                    valign: 'center'
+                    theme_text_color: "Custom"
+                    text_color: (0.95, 0.35, 0.35, 1) if root.es_destructivo else root.color_icono
+
+        # Texto de acción
+        BoxLayout:
+            orientation: 'vertical'
+            spacing: dp(1)
+            pos_hint: {'center_y': 0.5}
+
+            MDLabel:
+                text: root.titulo
+                font_size: "12sp"
+                bold: True
+                theme_text_color: "Custom"
+                text_color: (0.95, 0.35, 0.35, 1) if root.es_destructivo else app.text_primary
+                shorten: True
+
+            MDLabel:
+                text: root.subtitulo
+                font_size: "10sp"
+                theme_text_color: "Custom"
+                text_color: app.text_secondary
+                shorten: True
+
+        # Flecha indicadora
+        AnchorLayout:
+            size_hint: None, None
+            size: dp(20), dp(20)
+            anchor_x: 'center'
+            anchor_y: 'center'
+            pos_hint: {'center_y': 0.5}
+            MDIcon:
+                icon: "chevron-right"
+                font_size: "18sp"
+                size_hint: None, None
+                size: dp(18), dp(18)
+                halign: 'center'
+                valign: 'center'
+                theme_text_color: "Custom"
+                text_color: app.text_secondary
+
+<AvatarItemCard>:
+    orientation: 'vertical'
+    padding: dp(8)
+    spacing: dp(4)
+    size_hint: None, None
+    size: dp(70), dp(70)
+    radius: [dp(12), dp(12), dp(12), dp(12)]
+    md_bg_color: app.card_item_bg
+    line_color: app.color_acento if root.es_activo else app.card_border
+    line_width: 1.5 if root.es_activo else 1
+    ripple_behavior: True
+    on_release: root.trigger_select()
+    
+    AnchorLayout:
+        anchor_x: 'center'
+        anchor_y: 'center'
+        MDIcon:
+            icon: root.icono
+            font_size: "26sp"
+            size_hint: None, None
+            size: dp(26), dp(26)
+            halign: "center"
+            valign: "center"
+            theme_text_color: "Custom"
+            text_color: app.color_acento if root.es_activo else app.text_secondary
+    
+    MDLabel:
+        text: root.nombre
+        font_size: "9sp"
+        bold: True
+        halign: "center"
+        theme_text_color: "Custom"
+        text_color: app.text_primary if root.es_activo else app.text_secondary
+        size_hint_y: None
+        height: dp(14)
+        shorten: True
+
+<PerfilScreen>:
+    FloatLayout:
+        # Fondo dinámico reactivo al modo oscuro/claro
+        canvas.before:
+            Color:
+                rgba: app.bg_app
+            Rectangle:
+                pos: self.pos
+                size: self.size
+            Color:
+                rgba: app.color_acento[0], app.color_acento[1], app.color_acento[2], 0.03
+            Ellipse:
+                pos: self.width * 0.1, self.height * 0.70
+                size: self.width * 0.8, self.width * 0.8
+
+        # Header Superior Minimalista
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: 0.92, None
+            height: dp(50)
+            pos_hint: {'center_x': 0.5, 'top': 0.98}
+            spacing: dp(8)
+
+            MDIconButton:
+                icon: "arrow-left"
+                theme_text_color: "Custom"
+                text_color: app.text_primary
+                pos_hint: {'center_y': 0.5}
+                size_hint: None, None
+                size: dp(36), dp(36)
+                on_release: root.volver()
+
+            BoxLayout:
+                orientation: 'vertical'
+                pos_hint: {'center_y': 0.5}
+                spacing: 0
+
+                MDLabel:
+                    text: "CUENTA"
+                    font_size: "9sp"
+                    bold: True
+                    theme_text_color: "Custom"
+                    text_color: app.text_secondary
+
+                MDLabel:
+                    text: "Configuración de Perfil"
+                    font_style: "Subtitle1"
+                    bold: True
+                    theme_text_color: "Custom"
+                    text_color: app.text_primary
+
+        # Contenido Scrolleable
+        ScrollView:
+            effect_cls: ScrollEffect
+            do_scroll_x: False
+            size_hint: 0.92, 0.89
+            pos_hint: {'center_x': 0.5, 'top': 0.91}
+
+            BoxLayout:
+                orientation: 'vertical'
+                spacing: dp(14)
+                size_hint_y: None
+                height: self.minimum_height
+                padding: [0, dp(4), 0, dp(24)]
+
+                # ================= 1. TARJETA RESUMEN DE PERFIL =================
+                MDCard:
+                    size_hint_y: None
+                    height: dp(190)
+                    radius: [dp(16), dp(16), dp(16), dp(16)]
+                    md_bg_color: app.card_bg
+                    line_color: app.card_border
+                    line_width: 1
+                    elevation: 0
+                    padding: [dp(16), dp(16), dp(16), dp(14)]
+
+                    BoxLayout:
+                        orientation: 'vertical'
+                        spacing: dp(6)
+                        pos_hint: {'center_x': 0.5}
+
+                        # Avatar circular
+                        AnchorLayout:
+                            anchor_x: 'center'
+                            size_hint_y: None
+                            height: dp(56)
+
+                            MDCard:
+                                size_hint: None, None
+                                size: dp(56), dp(56)
+                                radius: [dp(28), dp(28), dp(28), dp(28)]
+                                md_bg_color: app.card_item_bg
+                                line_color: app.color_acento
+                                line_width: 1.4
+                                ripple_behavior: True
+                                on_release: root.abrir_selector_avatares()
+
+                                AnchorLayout:
+                                    anchor_x: 'center'
+                                    anchor_y: 'center'
+                                    MDIcon:
+                                        id: perfil_avatar_icon
+                                        icon: root.avatar_actual
+                                        font_size: "28sp"
+                                        size_hint: None, None
+                                        size: dp(28), dp(28)
+                                        halign: "center"
+                                        valign: "center"
+                                        theme_text_color: "Custom"
+                                        text_color: app.color_acento
+
+                        # Nombre y Email
+                        MDLabel:
+                            id: perfil_nombre_label
+                            text: root.nombre_usuario
+                            font_size: "14sp"
+                            bold: True
+                            halign: "center"
+                            theme_text_color: "Custom"
+                            text_color: app.text_primary
+                            size_hint_y: None
+                            height: dp(20)
+
+                        MDLabel:
+                            id: perfil_email_label
+                            text: root.email_usuario
+                            font_size: "10.5sp"
+                            halign: "center"
+                            theme_text_color: "Custom"
+                            text_color: app.text_secondary
+                            size_hint_y: None
+                            height: dp(16)
+
+                        # Badge de Rango & Botón Cambiar Avatar
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            size_hint_y: None
+                            height: dp(32)
+                            spacing: dp(8)
+                            pos_hint: {'center_x': 0.5}
+
+                            MDCard:
+                                size_hint_x: 0.65
+                                radius: [dp(8), dp(8), dp(8), dp(8)]
+                                md_bg_color: app.card_item_bg
+                                line_color: app.card_border
+                                line_width: 1
+                                padding: [dp(8), dp(2), dp(8), dp(2)]
+
+                                MDLabel:
+                                    text: root.rango_usuario
+                                    font_size: "9.5sp"
+                                    halign: "center"
+                                    valign: "middle"
+                                    theme_text_color: "Custom"
+                                    text_color: app.text_primary
+                                    shorten: True
+                                    shorten_from: 'right'
+
+                            MDCard:
+                                size_hint_x: 0.35
+                                radius: [dp(8), dp(8), dp(8), dp(8)]
+                                md_bg_color: app.card_item_bg
+                                line_color: app.card_border
+                                line_width: 1
+                                ripple_behavior: True
+                                on_release: root.abrir_selector_avatares()
+                                padding: [dp(6), dp(2), dp(6), dp(2)]
+
+                                BoxLayout:
+                                    orientation: 'horizontal'
+                                    spacing: dp(4)
+                                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
+                                    AnchorLayout:
+                                        anchor_x: 'center'
+                                        anchor_y: 'center'
+                                        size_hint: None, None
+                                        size: dp(14), dp(14)
+                                        MDIcon:
+                                            icon: "account-edit-outline"
+                                            font_size: "13sp"
+                                            size_hint: None, None
+                                            size: dp(13), dp(13)
+                                            halign: 'center'
+                                            valign: 'center'
+                                            theme_text_color: "Custom"
+                                            text_color: app.text_primary
+
+                                    MDLabel:
+                                        text: "Avatares"
+                                        font_size: "10sp"
+                                        bold: True
+                                        halign: 'center'
+                                        valign: 'middle'
+                                        theme_text_color: "Custom"
+                                        text_color: app.text_primary
+
+                # ================= 2. CAJA AVANCE: GAMIFICACIÓN & REPORTES =================
+                MDCard:
+                    size_hint_y: None
+                    height: dp(154)
+                    radius: [dp(16), dp(16), dp(16), dp(16)]
+                    md_bg_color: app.card_bg
+                    line_color: app.card_border
+                    line_width: 1
+                    elevation: 0
+                    padding: [dp(14), dp(12), dp(14), dp(12)]
+
+                    BoxLayout:
+                        orientation: 'vertical'
+                        spacing: dp(8)
+
+                        MDLabel:
+                            text: "AVANCE & REPORTES"
+                            font_size: "10sp"
+                            bold: True
+                            theme_text_color: "Custom"
+                            text_color: app.text_secondary
+                            size_hint_y: None
+                            height: dp(16)
+
+                        SettingsActionRow:
+                            titulo: "Muro de Insignias y Logros"
+                            subtitulo: "Nivel RPG, experiencia y medallas"
+                            icono: "trophy-outline"
+                            color_icono: app.color_acento
+                            on_release: root.abrir_muro_logros()
+
+                        SettingsActionRow:
+                            titulo: "Exportar Reportes de Hábitos"
+                            subtitulo: "Generar archivo de rendimiento en Descargas"
+                            icono: "file-document-outline"
+                            color_icono: app.color_acento
+                            on_release: root.exportar_reportes()
+
+                # ================= 3. CAJA APARIENCIA & TEMAS =================
+                MDCard:
+                    size_hint_y: None
+                    height: dp(154)
+                    radius: [dp(16), dp(16), dp(16), dp(16)]
+                    md_bg_color: app.card_bg
+                    line_color: app.card_border
+                    line_width: 1
+                    elevation: 0
+                    padding: [dp(14), dp(12), dp(14), dp(12)]
+
+                    BoxLayout:
+                        orientation: 'vertical'
+                        spacing: dp(8)
+
+                        MDLabel:
+                            text: "APARIENCIA & SISTEMA"
+                            font_size: "10sp"
+                            bold: True
+                            theme_text_color: "Custom"
+                            text_color: app.text_secondary
+                            size_hint_y: None
+                            height: dp(16)
+
+                        # Color de Acento
+                        MDCard:
+                            size_hint_y: None
+                            height: dp(48)
+                            radius: [dp(12), dp(12), dp(12), dp(12)]
+                            md_bg_color: app.card_item_bg
+                            line_color: app.card_border
+                            line_width: 1
+                            padding: [dp(12), dp(6), dp(12), dp(6)]
+
+                            BoxLayout:
+                                orientation: 'horizontal'
+                                pos_hint: {'center_y': 0.5}
+
+                                BoxLayout:
+                                    orientation: 'vertical'
+                                    pos_hint: {'center_y': 0.5}
+                                    MDLabel:
+                                        text: "Color de Acento"
+                                        font_size: "12sp"
+                                        bold: True
+                                        theme_text_color: "Custom"
+                                        text_color: app.text_primary
+                                    MDLabel:
+                                        id: label_tema_activo
+                                        text: root.tema_actual_nombre
+                                        font_size: "10sp"
+                                        theme_text_color: "Custom"
+                                        text_color: app.text_secondary
+
+                                BoxLayout:
+                                    orientation: 'horizontal'
+                                    spacing: dp(6)
+                                    size_hint_x: None
+                                    width: dp(140)
+                                    pos_hint: {'center_y': 0.5}
+
+                                    # Crimson
+                                    MDIconButton:
+                                        icon: "circle"
+                                        theme_text_color: "Custom"
+                                        text_color: 0.88, 0.11, 0.28, 1
+                                        size_hint: None, None
+                                        size: dp(24), dp(24)
+                                        on_release: root.cambiar_tema("Crimson", "Red")
+
+                                    # Indigo
+                                    MDIconButton:
+                                        icon: "circle"
+                                        theme_text_color: "Custom"
+                                        text_color: 0.45, 0.40, 0.95, 1
+                                        size_hint: None, None
+                                        size: dp(24), dp(24)
+                                        on_release: root.cambiar_tema("Índigo", "Purple")
+
+                                    # Cyan
+                                    MDIconButton:
+                                        icon: "circle"
+                                        theme_text_color: "Custom"
+                                        text_color: 0.05, 0.75, 0.88, 1
+                                        size_hint: None, None
+                                        size: dp(24), dp(24)
+                                        on_release: root.cambiar_tema("Cyan", "Cyan")
+
+                                    # Esmeralda
+                                    MDIconButton:
+                                        icon: "circle"
+                                        theme_text_color: "Custom"
+                                        text_color: 0.10, 0.75, 0.50, 1
+                                        size_hint: None, None
+                                        size: dp(24), dp(24)
+                                        on_release: root.cambiar_tema("Esmeralda", "Green")
+
+                                    # Slate
+                                    MDIconButton:
+                                        icon: "circle"
+                                        theme_text_color: "Custom"
+                                        text_color: 0.50, 0.55, 0.65, 1
+                                        size_hint: None, None
+                                        size: dp(24), dp(24)
+                                        on_release: root.cambiar_tema("Slate", "BlueGray")
+
+                        SettingsActionRow:
+                            id: row_estilo_modo
+                            titulo: "Modo Oscuro / Claro"
+                            subtitulo: "Alternar paleta del sistema"
+                            icono: "theme-light-dark"
+                            color_icono: app.color_acento
+                            on_release: root.toggle_modo_oscuro()
+
+                # ================= 4. CAJA GESTIÓN DE CUENTA =================
+                MDCard:
+                    size_hint_y: None
+                    height: dp(154)
+                    radius: [dp(16), dp(16), dp(16), dp(16)]
+                    md_bg_color: app.card_bg
+                    line_color: app.card_border
+                    line_width: 1
+                    elevation: 0
+                    padding: [dp(14), dp(12), dp(14), dp(12)]
+
+                    BoxLayout:
+                        orientation: 'vertical'
+                        spacing: dp(8)
+
+                        MDLabel:
+                            text: "GESTIÓN DE CUENTA"
+                            font_size: "10sp"
+                            bold: True
+                            theme_text_color: "Custom"
+                            text_color: app.text_secondary
+                            size_hint_y: None
+                            height: dp(16)
+
+                        SettingsActionRow:
+                            titulo: "Cerrar Sesión"
+                            subtitulo: "Finalizar sesión en este dispositivo"
+                            icono: "logout"
+                            color_icono: app.text_secondary
+                            on_release: root.confirmar_cerrar_sesion()
+
+                        SettingsActionRow:
+                            titulo: "Eliminar Cuenta"
+                            subtitulo: "Borrar permanentemente cuenta y datos"
+                            icono: "delete-outline"
+                            color_icono: 0.95, 0.35, 0.35, 1
+                            es_destructivo: True
+                            on_release: root.confirmar_eliminar_cuenta()

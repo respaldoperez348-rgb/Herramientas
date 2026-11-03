@@ -186,6 +186,17 @@ class BaseDatos:
         except Exception as e:
             return {"exito": False, "mensaje": str(e)}
 
+    def eliminar_usuario(self, usuario_id):
+        try:
+            self.cursor.execute("DELETE FROM usuarios WHERE id = %s", (usuario_id,))
+            self.conn.commit()
+            print(f"Usuario {usuario_id} eliminado exitosamente")
+            return {"exito": True, "mensaje": "Usuario y datos eliminados correctamente"}
+        except Exception as e:
+            if hasattr(self, 'conn') and self.conn:
+                self.conn.rollback()
+            return {"exito": False, "mensaje": str(e)}
+
     # =================== MÉTODOS DE HÁBITOS ===================
     def crear_habito(self, usuario_id, nombre, descripcion="", objetivo_minutos=30, categoria="Salud"):
         try:
