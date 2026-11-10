@@ -12,14 +12,13 @@ class Habit:
     completion_dates: List[date] = field(default_factory=list)
 
 class HabitoService:
-    """Core service for managing user habits and tracking progress."""
     
     def __init__(self, db_repository):
         # Inject your database repository/ORM session here
         self.db = db_repository
 
     def create_habit(self, user_id: str, name: str, description: str = "") -> Habit:
-        """Creates a new habit for a user."""
+     
         habit = Habit(
             id=self._generate_id(),
             user_id=user_id,
