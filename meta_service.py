@@ -4,7 +4,6 @@ from datetime import datetime
 from typing import Dict, Any
 
 class MetaService:
-    """Service for handling application metadata, configs, and health metrics."""
     
     def __init__(self, config_provider):
         # Inject environment variables or config manager here
@@ -12,7 +11,7 @@ class MetaService:
         self._start_time = datetime.utcnow()
 
     def get_app_info(self) -> Dict[str, Any]:
-        """Returns standard metadata about the running application."""
+  
         return {
             "app_name": self.config.get("APP_NAME", "Habito API"),
             "version": self.config.get("APP_VERSION", "1.0.0"),
@@ -21,7 +20,7 @@ class MetaService:
         }
 
     def get_system_health(self) -> Dict[str, Any]:
-        """Runs basic diagnostic checks for system health."""
+    
         # In a real app, you would ping the DB, Redis, etc. here
         db_status = self._check_db_connection()
         
@@ -36,7 +35,7 @@ class MetaService:
         }
 
     def get_feature_flags(self, user_id: str = None) -> Dict[str, bool]:
-        """Retrieves active feature flags, optionally scoped to a user."""
+
         base_flags = {
             "enable_dark_mode": True,
             "enable_social_sharing": self.config.get("ENABLE_SOCIAL", False),
@@ -50,7 +49,6 @@ class MetaService:
         return base_flags
 
     def _check_db_connection(self) -> bool:
-        """Internal method to verify database connectivity."""
         try:
             # Simulate DB ping
             return True
