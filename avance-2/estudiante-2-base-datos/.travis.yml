@@ -1,0 +1,10 @@
+language: python
+python:
+  - "3.10"
+
+install:
+  - pip install psycopg2-binary
+
+script:
+  # Verifica que el archivo no tenga errores de sintaxis en Python
+  - python -m py_compile database_extension.py

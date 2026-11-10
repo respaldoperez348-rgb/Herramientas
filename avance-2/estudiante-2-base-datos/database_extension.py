@@ -92,6 +92,70 @@ class DatabaseExtension:
             return {"exito": False, "mensaje": str(e)}
 
 
+    # FUNCIONES PARA METAS
+    def crear_meta(self, id_usuario, titulo, dias_vencimiento=30):
+        """Guarda una nueva meta visual en la base de datos"""
+        try:
+            self.cursor.execute("""
+                INSERT INTO metas (id_usuario, titulo, dias_vencimiento)
+                VALUES (%s, %s, %s)
+                RETURNING id;
+            """, (id_usuario, titulo, dias_vencimiento))
+            id_meta = self.cursor.fetchone()['id']
+            self.conn.commit()
+            return {"exito": True, "id_meta": id_meta}
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Error creando meta: {e}")
+            return {"exito": False, "mensaje": str(e)}
+    
+    def obtener_metas_usuario(self, id_usuario):
+        """Extrae todas las metas de un usuario para mostrarlas en pantalla"""
+        try:
+            self.cursor.execute("""
+                SELECT id, titulo, progreso_inicial, dias_vencimiento, fecha_creacion 
+                FROM metas 
+                WHERE id_usuario = %s 
+                ORDER BY fecha_creacion DESC;
+            """, (id_usuario,))
+            return self.cursor.fetchall()
+        except Exception as e:
+            print(f"Error obteniendo metas: {e}")
+            return []
+    
+    
+    # FUNCIONES PARA ALARMAS
+    def crear_alarma(self, id_usuario, titulo, hora_exacta, dias_activos="Lunes - Viernes"):
+        """Guarda una nueva alarma inteligente"""
+        try:
+            self.cursor.execute("""
+                INSERT INTO alarmas (id_usuario, titulo, hora_exacta, dias_activos)
+                VALUES (%s, %s, %s, %s)
+                RETURNING id;
+            """, (id_usuario, titulo, hora_exacta, dias_activos))
+            id_alarma = self.cursor.fetchone()['id']
+            self.conn.commit()
+            return {"exito": True, "id_alarma": id_alarma}
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Error creando alarma: {e}")
+            return {"exito": False, "mensaje": str(e)}
+    
+    def obtener_alarmas_usuario(self, id_usuario):
+        """Extrae todas las alarmas de un usuario ordenadas por hora"""
+        try:
+            self.cursor.execute("""
+                SELECT id, titulo, hora_exacta, dias_activos, activa 
+                FROM alarmas 
+                WHERE id_usuario = %s 
+                ORDER BY hora_exacta ASC;
+            """, (id_usuario,))
+            return self.cursor.fetchall()
+        except Exception as e:
+            print(f"Error obteniendo alarmas: {e}")
+            return []
+
+
 
     def cerrar_conexion(self):
         self.cursor.close()
