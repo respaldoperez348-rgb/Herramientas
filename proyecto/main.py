@@ -111,7 +111,11 @@ class HabitTrackerApp(MDApp):
         
         base_dir = os.path.dirname(os.path.abspath(__file__))
         for kv in archivos_kv:
+            # Buscar en screens/kv/ y fallback a screens/
             ruta_kv = os.path.join(base_dir, 'screens', 'kv', kv)
+            if not os.path.exists(ruta_kv):
+                ruta_kv = os.path.join(base_dir, 'screens', kv)
+
             if os.path.exists(ruta_kv):
                 Builder.load_file(ruta_kv)
             else:

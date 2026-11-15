@@ -94,7 +94,7 @@ class HabitCard(MDCard):
 
     def editar_habito(self):
         if self.inicio_screen:
-            self.inicio_screen.editar_habito_dialog(self.habi3t_id)
+            self.inicio_screen.editar_habito_dialog(self.habit_id)
 
     def eliminar_habito(self):
         if self.inicio_screen:
@@ -552,6 +552,12 @@ class InicioScreen(MDScreen):
         self.dialog.open()
 
     def eliminar_habito(self, habit_id):
+        if hasattr(self, 'app') and self.app and hasattr(self.app, 'base_datos') and self.app.base_datos:
+            try:
+                self.app.base_datos.eliminar_habito(habit_id)
+            except Exception as e:
+                print(f"Error eliminando de BD: {e}")
+
         self._habitos_demo = [h for h in self._habitos_demo if h['id'] != habit_id]
         if self.dialog:
             self.dialog.dismiss()
