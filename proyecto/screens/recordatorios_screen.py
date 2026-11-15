@@ -118,7 +118,8 @@ class FormularioNuevoRecordatorio(MDBoxLayout):
 
         # 5. Switch Activo
         box_switch = MDBoxLayout(orientation='horizontal', size_hint_y=None, height="34dp", spacing="10dp")
-        self.switch_activo = MDSwitch(active=True, size_hint=(None, None), size=("40dp", "24dp"))
+        self.switch_activo = MDSwitch(size_hint=(None, None), size=("40dp", "24dp"))
+        self.switch_activo.active = True
         box_switch.add_widget(self.switch_activo)
         self.add_widget(box_switch)
 

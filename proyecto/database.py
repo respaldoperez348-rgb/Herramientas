@@ -1,3 +1,4 @@
+import os
 import psycopg2
 import bcrypt
 from psycopg2.extras import RealDictCursor
@@ -5,13 +6,22 @@ from datetime import datetime, timedelta
 
 class BaseDatos:
     def __init__(self):
-        self.conn = psycopg2.connect(
-            host="localhost",
-            database="habitos_bd",
-            user="postgres",
-            password="master.1",
-            port="5432",
-        )
+        os.environ.setdefault("PGCLIENTENCODING", "UTF8")
+        try:
+            self.conn = psycopg2.connect(
+                host=os.getenv("DB_HOST", "localhost"),
+                database=os.getenv("DB_NAME", "habitos_bd"),
+                user=os.getenv("DB_USER", "postgres"),
+                password=os.getenv("DB_PASSWORD", "123456"),
+                port=os.getenv("DB_PORT", "5432"),
+                options="-c client_encoding=UTF8",
+            )
+        except UnicodeDecodeError:
+            raise ConnectionError(
+                "No se pudo conectar a PostgreSQL: verifica que la base de datos 'habitos_bd' "
+                "exista y que la contraseña del usuario 'postgres' sea correcta."
+            )
+
         self.cursor = self.conn.cursor(cursor_factory=RealDictCursor)
         print("Conectado a la base de datos")
         self.crear_tablas()
@@ -59,7 +69,7 @@ class BaseDatos:
                 )
             """)
             
-            # Tabla de recordatorios
+            # Tabla de recordatorios (Actualización)
             self.cursor.execute("""
                 CREATE TABLE IF NOT EXISTS recordatorios (
                     id SERIAL PRIMARY KEY,
@@ -69,6 +79,27 @@ class BaseDatos:
                     hora_fin TIME
                 )
             """)
+            self.cursor.execute("""
+                ALTER TABLE recordatorios
+                    ADD COLUMN IF NOT EXISTS hora VARCHAR(10),
+                    ADD COLUMN IF NOT EXISTS dias_semana VARCHAR(100) DEFAULT 'Lun, Mar, Mié, Jue, Vie, Sáb, Dom',
+                    ADD COLUMN IF NOT EXISTS mensaje TEXT DEFAULT ''
+            """)
+
+            # Tabla de metas
+            self.cursor.execute("""
+                CREATE TABLE IF NOT EXISTS metas (
+                    id SERIAL PRIMARY KEY,
+                    usuario_id INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+                    habito_id INTEGER REFERENCES habitos(id) ON DELETE SET NULL,
+                    titulo VARCHAR(150) NOT NULL,
+                    progreso_porcentaje NUMERIC(5,2) DEFAULT 0.0,
+                    fecha_limite DATE,
+                    estado VARCHAR(30) DEFAULT 'En progreso',
+                    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+
             
             # Índices para mejor rendimiento
             self.cursor.execute("""
@@ -77,9 +108,16 @@ class BaseDatos:
             self.cursor.execute("""
                 CREATE INDEX IF NOT EXISTS idx_habitos_usuario ON habitos(usuario_id)
             """)
+
+
+            # Nuevo índice para la tabla de metas
+            self.cursor.execute("""
+                CREATE INDEX IF NOT EXISTS idx_metas_usuario ON metas(usuario_id)
+            """)
+
             
             self.conn.commit()
-            print("Tablas creadas exitosamente")
+            print("Tablas creadas/actualizadas exitosamente")
             
         except Exception as e:
             self.conn.rollback()
@@ -152,17 +190,22 @@ class BaseDatos:
                 "Bienestar": {"icono": "leaf", "color": "#06b6d4"}
             }
             
-            categoria_info = mapeo_categorias.get(categoria, {"icono": "checkbox-blank-circle", "color": "#3b82f6"})
+            categoria_info = mapeo_categorias.get(
+                categoria, {"icono": "checkbox-blank-circle", "color": "#3b82f6"}
+            )
             
             self.cursor.execute("""
                 INSERT INTO habitos (usuario_id, nombre, descripcion, objetivo_diario_minutos, categoria, icono, color)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
                 RETURNING id, nombre, descripcion, objetivo_diario_minutos, categoria, icono, color, fecha_creacion
-            """, (usuario_id, nombre, descripcion, objetivo_minutos, categoria, categoria_info["icono"], categoria_info["color"]))
+            """, (
+                usuario_id, nombre, descripcion, objetivo_minutos, 
+                categoria, categoria_info["icono"], categoria_info["color"]
+            ))
             
             habito = self.cursor.fetchone()
             
-            # Crear recordatorio por defecto
+            # Crear recordatorio por defecto 
             self.cursor.execute("""
                 INSERT INTO recordatorios (habito_id)
                 VALUES (%s)
@@ -194,8 +237,7 @@ class BaseDatos:
             
             # Calcular rachas para cada hábito
             for habito in habitos:
-                racha = self.calcular_racha_habito(habito['id'])
-                habito['racha_dias'] = racha
+                habito['racha_dias'] = self.calcular_racha_habito(habito['id'])
             
             return habitos
             
@@ -346,7 +388,7 @@ class BaseDatos:
             print(f"Error calculando promedio: {e}")
             return 0
 
-# En la clase BaseDatos, añade este método:
+
 
     def obtener_estadisticas_usuario(self, usuario_id):
         try:
@@ -425,6 +467,103 @@ class BaseDatos:
             print(f"Error calculando racha total: {e}")
             return 0
 
+
+
+    # =================== MÉTODOS DE METAS (metas_screen.py) ===================
+    def obtener_metas_usuario(self, usuario_id):
+        try:
+            self.cursor.execute("""
+                SELECT
+                    m.id AS id_meta,
+                    m.usuario_id AS id_usuario,
+                    COALESCE(m.habito_id, 0) AS id_habito,
+                    COALESCE(h.nombre, 'General') AS nombre_habito,
+                    m.titulo,
+                    COALESCE(m.progreso_porcentaje, 0.0) AS progreso_porcentaje,
+                    COALESCE(TO_CHAR(m.fecha_limite, 'YYYY-MM-DD'), 'Sin fecha') AS fecha_limite,
+                    COALESCE(m.estado, 'En progreso') AS estado
+                FROM metas m
+                LEFT JOIN habitos h ON m.habito_id = h.id
+                WHERE m.usuario_id = %s
+                ORDER BY m.id DESC
+            """, (usuario_id,))
+
+            filas = self.cursor.fetchall()
+            metas = []
+            for f in filas:
+                item = dict(f)
+                item['progreso_porcentaje'] = float(item['progreso_porcentaje'])
+                metas.append(item)
+            return metas
+
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Error obteniendo metas: {e}")
+            return []
+
+
+
+
+    def crear_meta(self, usuario_id, habito_id, titulo, progreso_porcentaje=0.0, fecha_limite=None):
+        try:
+            pct = min(100.0, max(0.0, float(progreso_porcentaje or 0.0)))
+            estado = "Completado" if pct >= 100.0 else "En progreso"
+
+            habito_valido = None
+            if habito_id:
+                self.cursor.execute("SELECT id FROM habitos WHERE id = %s", (habito_id,))
+                if self.cursor.fetchone():
+                    habito_valido = habito_id
+
+            fecha_val = fecha_limite if fecha_limite else None
+
+            self.cursor.execute("""
+                INSERT INTO metas (usuario_id, habito_id, titulo, progreso_porcentaje, fecha_limite, estado)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                RETURNING id
+            """, (usuario_id, habito_valido, titulo, pct, fecha_val, estado))
+
+            fila = self.cursor.fetchone()
+            self.conn.commit()
+            return fila['id'] if fila else None
+
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Error creando meta: {e}")
+            return None
+
+
+    def actualizar_progreso_meta(self, id_meta, nuevo_porcentaje, nuevo_estado=None):
+        try:
+            pct = min(100.0, max(0.0, float(nuevo_porcentaje)))
+            estado = nuevo_estado or ("Completado" if pct >= 100.0 else "En progreso")
+
+            self.cursor.execute("""
+                UPDATE metas
+                SET progreso_porcentaje = %s, estado = %s
+                WHERE id = %s
+            """, (pct, estado, id_meta))
+            self.conn.commit()
+            return True
+
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Error actualizando progreso de meta: {e}")
+            return False
+
+
+
+    def eliminar_meta(self, id_meta):
+        try:
+            self.cursor.execute("DELETE FROM metas WHERE id = %s", (id_meta,))
+            self.conn.commit()
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Error eliminando meta: {e}")
+            return False
+    
+
     # =================== MÉTODOS DE RECORDATORIOS ===================
     def actualizar_recordatorio(self, habito_id, activo, hora_inicio=None, hora_fin=None):
         try:
@@ -451,6 +590,149 @@ class BaseDatos:
         except Exception as e:
             print(f"Error obteniendo recordatorio: {e}")
             return None
+
+
+
+    def obtener_recordatorios_usuario(self, usuario_id):
+        try:
+            self.cursor.execute("""
+                SELECT
+                    r.id AS id_recordatorio,
+                    r.habito_id AS id_habito,
+                    h.nombre AS nombre_habito,
+                    COALESCE(r.hora, TO_CHAR(r.hora_inicio, 'HH24:MI'), '08:00') AS hora,
+                    COALESCE(r.dias_semana, 'Lun, Mar, Mié, Jue, Vie, Sáb, Dom') AS dias_semana,
+                    COALESCE(r.activo, FALSE) AS activo,
+                    COALESCE(r.mensaje, '') AS mensaje
+                FROM recordatorios r
+                JOIN habitos h ON r.habito_id = h.id
+                WHERE h.usuario_id = %s
+                  AND (r.hora IS NOT NULL OR r.hora_inicio IS NOT NULL OR r.activo = TRUE)
+                ORDER BY r.id DESC
+            """, (usuario_id,))
+            return [dict(r) for r in self.cursor.fetchall()]
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Error obteniendo recordatorios del usuario: {e}")
+            return []
+
+
+
+    def crear_recordatorio_v2(self, habito_id, hora, dias_semana, activo=True, mensaje=""):
+        try:
+            self.cursor.execute("SELECT id FROM habitos WHERE id = %s", (habito_id,))
+            if not self.cursor.fetchone():
+                self.cursor.execute("SELECT id FROM habitos ORDER BY id ASC LIMIT 1")
+                primero = self.cursor.fetchone()
+                if not primero:
+                    print("No existen hábitos registrados para asociar el recordatorio.")
+                    return None
+                habito_id = primero['id']
+
+            hora_limpia = (hora or "08:00").strip()[:5]
+            hora_inicio_sql = None
+            try:
+                datetime.strptime(hora_limpia, "%H:%M")
+                hora_inicio_sql = hora_limpia
+            except ValueError:
+                hora_inicio_sql = None
+
+            self.cursor.execute("""
+                INSERT INTO recordatorios (habito_id, activo, hora_inicio, hora, dias_semana, mensaje)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                RETURNING id
+            """, (habito_id, bool(activo), hora_inicio_sql, hora_limpia, dias_semana, mensaje))
+
+            fila = self.cursor.fetchone()
+            self.conn.commit()
+            return fila['id'] if fila else None
+
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Error creando recordatorio V2: {e}")
+            return None
+
+
+
+    def actualizar_recordatorio_v2(self, id_recordatorio, activo):
+        try:
+            self.cursor.execute("""
+                UPDATE recordatorios
+                SET activo = %s
+                WHERE id = %s
+            """, (bool(activo), id_recordatorio))
+            self.conn.commit()
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Error actualizando estado de recordatorio: {e}")
+            return False
+
+
+
+    def eliminar_recordatorio(self, id_recordatorio):
+        try:
+            self.cursor.execute("DELETE FROM recordatorios WHERE id = %s", (id_recordatorio,))
+            self.conn.commit()
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Error eliminando recordatorio: {e}")
+            return False
+
+        
+    
+    # =================== AUDITORÍA DE DESERCIÓN (asistente_screen.py) ===================
+    def obtener_habitos_en_riesgo(self, usuario_id, dias=7, umbral=50.0):
+        try:
+            dias_eval = max(1, int(dias))
+            self.cursor.execute("""
+                SELECT
+                    h.id AS id_habito,
+                    h.nombre,
+                    h.objetivo_diario_minutos,
+                    COUNT(DISTINCT s.fecha) FILTER (
+                        WHERE s.fecha >= CURRENT_DATE - (%s - 1)
+                    ) AS dias_cumplidos
+                FROM habitos h
+                LEFT JOIN sesiones s ON h.id = s.habito_id
+                WHERE h.usuario_id = %s
+                GROUP BY h.id, h.nombre, h.objetivo_diario_minutos
+                ORDER BY dias_cumplidos ASC, h.id ASC
+            """, (dias_eval, usuario_id))
+
+            filas = self.cursor.fetchall()
+            en_riesgo = []
+            for f in filas:
+                cumplidos = int(f['dias_cumplidos'] or 0)
+                porcentaje = round((cumplidos / dias_eval) * 100.0, 1)
+                if porcentaje < float(umbral):
+                    obj_min = int(f['objetivo_diario_minutos'] or 30)
+                    obj_sugerido = max(5, obj_min // 2)
+                    en_riesgo.append({
+                        "id_habito": f['id_habito'],
+                        "nombre": f['nombre'],
+                        "porcentaje": porcentaje,
+                        "dias_evaluados": dias_eval,
+                        "dias_cumplidos": cumplidos,
+                        "diagnostico": (
+                            f"Detectado {porcentaje:.0f}% de completitud en los últimos {dias_eval} días "
+                            f"({cumplidos} de {dias_eval} días completados)."
+                        ),
+                        "recomendacion": (
+                            f"Reajuste sugerido: reduce temporalmente el objetivo de {obj_min} min "
+                            f"a {obj_sugerido} min diarios y activa un recordatorio diario."
+                        )
+                    })
+            return en_riesgo
+
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Error auditando hábitos en riesgo: {e}")
+            return []
+
+
+
 
     def cerrar_conexion(self):
         self.cursor.close()
