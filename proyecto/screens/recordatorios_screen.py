@@ -1,7 +1,7 @@
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.card import MDCard
 from kivymd.uix.dialog import MDDialog
-from kivymd.uix.button import MDFlatButton, MDRaisedButton, MDFillRoundFlatButton
+from kivymd.uix.button import MDFlatButton, MDRaisedButton, MDFillRoundFlatButton, MDRoundFlatIconButton
 from kivymd.uix.textfield import MDTextField
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.label import MDLabel
@@ -9,7 +9,9 @@ from kivymd.uix.selectioncontrol import MDSwitch
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.list import OneLineListItem
 from kivymd.uix.pickers import MDTimePicker
+from kivy.uix.widget import Widget
 from kivy.properties import StringProperty, BooleanProperty, NumericProperty
+from kivy.metrics import dp
 from datetime import time
 
 
@@ -41,9 +43,9 @@ class FormularioNuevoRecordatorio(MDBoxLayout):
     def __init__(self, lista_habitos, abrir_time_picker_callback, **kwargs):
         super().__init__(**kwargs)
         self.orientation = 'vertical'
-        self.spacing = "10dp"
+        self.spacing = dp(12)
         self.size_hint_y = None
-        self.height = "320dp"
+        self.height = dp(330)
 
         self.habitos = lista_habitos
         self.habito_seleccionado_id = self.habitos[0]['id'] if self.habitos else 1
@@ -55,7 +57,8 @@ class FormularioNuevoRecordatorio(MDBoxLayout):
         self.btn_habito = MDRaisedButton(
             text=f"Hábito: {self.habito_seleccionado_nombre}",
             size_hint_x=1,
-            md_bg_color=(0.15, 0.20, 0.30, 1),
+            elevation=0,
+            md_bg_color=(0.18, 0.23, 0.33, 1),
             on_release=self.abrir_menu_habitos
         )
         self.add_widget(self.btn_habito)
@@ -73,12 +76,17 @@ class FormularioNuevoRecordatorio(MDBoxLayout):
             width_mult=4
         )
 
-        # 2. Selector de Hora con TimePicker
-        box_hora = MDBoxLayout(orientation='horizontal', spacing="8dp", size_hint_y=None, height="38dp")
-        self.btn_hora = MDRaisedButton(
-            text=f"Hora: {self.hora_seleccionada}",
-            size_hint_x=0.6,
-            md_bg_color=(0.18, 0.23, 0.33, 1),
+        # 2. Selector de Hora interactivo sin superposiciones
+        box_hora = MDBoxLayout(
+            orientation='horizontal',
+            spacing=dp(10),
+            size_hint_y=None,
+            height=dp(48)
+        )
+        self.btn_hora = MDRoundFlatIconButton(
+            icon="clock-outline",
+            text="Elegir Hora",
+            size_hint_x=0.55,
             on_release=lambda x: abrir_time_picker_callback(self.actualizar_hora)
         )
         box_hora.add_widget(self.btn_hora)
@@ -86,27 +94,43 @@ class FormularioNuevoRecordatorio(MDBoxLayout):
         self.campo_hora_manual = MDTextField(
             text=self.hora_seleccionada,
             hint_text="HH:MM",
-            size_hint_x=0.4,
+            size_hint_x=0.45,
             mode="rectangle"
         )
         box_hora.add_widget(self.campo_hora_manual)
         self.add_widget(box_hora)
 
-        # 3. Días de la semana interactivos
-        box_dias = MDBoxLayout(orientation='horizontal', spacing="4dp", size_hint_y=None, height="36dp")
+        # 3. Días de la semana centrados y compactos (sin desborde)
+        box_dias = MDBoxLayout(
+            orientation='horizontal',
+            spacing=dp(6),
+            size_hint_y=None,
+            height=dp(36),
+            pos_hint={'center_x': 0.5}
+        )
         self.botones_dias = {}
-        todos_dias = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
-        for dia in todos_dias:
-            activo = dia in self.dias_activos
+        todos_dias = [
+            ("Lun", "L"),
+            ("Mar", "M"),
+            ("Mié", "M"),
+            ("Jue", "J"),
+            ("Vie", "V"),
+            ("Sáb", "S"),
+            ("Dom", "D")
+        ]
+        for dia_clave, dia_letra in todos_dias:
+            activo = dia_clave in self.dias_activos
             btn = MDFillRoundFlatButton(
-                text=dia[0],
-                font_size="10sp",
-                size_hint_x=1.0 / 7.0,
-                md_bg_color=(0, 0.75, 1, 0.9) if activo else (0.15, 0.18, 0.25, 1),
+                text=dia_letra,
+                font_size="11sp",
+                size_hint=(None, None),
+                size=(dp(34), dp(34)),
+                padding=(dp(4), dp(4)),
+                md_bg_color=(0.10, 0.65, 0.50, 1) if activo else (0.16, 0.20, 0.28, 1),
                 text_color=(1, 1, 1, 1) if activo else (0.6, 0.65, 0.75, 1)
             )
-            btn.bind(on_release=lambda instance, d=dia: self.toggle_dia(d))
-            self.botones_dias[dia] = btn
+            btn.bind(on_release=lambda instance, d=dia_clave: self.toggle_dia(d))
+            self.botones_dias[dia_clave] = btn
             box_dias.add_widget(btn)
         self.add_widget(box_dias)
 
@@ -118,10 +142,21 @@ class FormularioNuevoRecordatorio(MDBoxLayout):
         )
         self.add_widget(self.campo_mensaje)
 
-        # 5. Switch Activo
-        box_switch = MDBoxLayout(orientation='horizontal', size_hint_y=None, height="34dp", spacing="10dp")
-        box_switch.add_widget(MDLabel(text="Activar recordatorio:", font_style="Caption", theme_text_color="Custom", text_color=(0.7, 0.75, 0.85, 1)))
-        self.switch_activo = MDSwitch(size_hint=(None, None), size=("40dp", "24dp"))
+        # 5. Switch Activo alineado a la derecha
+        box_switch = MDBoxLayout(
+            orientation='horizontal',
+            size_hint_y=None,
+            height=dp(36),
+            spacing=dp(10)
+        )
+        box_switch.add_widget(MDLabel(
+            text="Activar recordatorio:",
+            font_style="Subtitle2",
+            theme_text_color="Custom",
+            text_color=(0.7, 0.75, 0.85, 1)
+        ))
+        box_switch.add_widget(Widget())
+        self.switch_activo = MDSwitch(size_hint=(None, None), size=(dp(44), dp(28)))
         box_switch.add_widget(self.switch_activo)
         self.add_widget(box_switch)
 
@@ -137,17 +172,16 @@ class FormularioNuevoRecordatorio(MDBoxLayout):
 
     def actualizar_hora(self, nueva_hora_str):
         self.hora_seleccionada = nueva_hora_str
-        self.btn_hora.text = f"Hora: {nueva_hora_str}"
         self.campo_hora_manual.text = nueva_hora_str
 
     def toggle_dia(self, dia):
         if dia in self.dias_activos:
             self.dias_activos.remove(dia)
-            self.botones_dias[dia].md_bg_color = (0.15, 0.18, 0.25, 1)
+            self.botones_dias[dia].md_bg_color = (0.16, 0.20, 0.28, 1)
             self.botones_dias[dia].text_color = (0.6, 0.65, 0.75, 1)
         else:
             self.dias_activos.append(dia)
-            self.botones_dias[dia].md_bg_color = (0, 0.75, 1, 0.9)
+            self.botones_dias[dia].md_bg_color = (0.10, 0.65, 0.50, 1)
             self.botones_dias[dia].text_color = (1, 1, 1, 1)
 
 

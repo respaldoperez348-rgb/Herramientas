@@ -107,6 +107,7 @@
             size: dp(150), dp(24)
             md_bg_color: app.color_acento
             text_color: 1, 1, 1, 1
+            elevation: 0
             on_release: root.accion_reajustar()
 
         MDFillRoundFlatButton:
@@ -114,8 +115,11 @@
             font_size: "10sp"
             size_hint: None, None
             size: dp(115), dp(24)
-            md_bg_color: (0.12, 0.16, 0.23, 1)
-            text_color: app.text_secondary
+            md_bg_color: app.card_item_bg
+            line_color: app.card_border
+            line_width: 1
+            text_color: app.text_primary
+            elevation: 0
             on_release: root.accion_recordatorio()
 
 <MensajeChatWidget>:
@@ -134,8 +138,8 @@
         size_hint_y: None
         height: self.minimum_height
         radius: [dp(14), dp(14), 0, dp(14)] if root.es_usuario else [dp(14), dp(14), dp(14), 0]
-        md_bg_color: (app.color_acento[0], app.color_acento[1], app.color_acento[2], 0.22) if root.es_usuario else app.card_item_bg
-        line_color: app.color_acento if root.es_usuario else app.card_border
+        md_bg_color: (app.color_acento[0], app.color_acento[1], app.color_acento[2], 0.12) if root.es_usuario else app.card_item_bg
+        line_color: (app.color_acento[0], app.color_acento[1], app.color_acento[2], 0.35) if root.es_usuario else app.card_border
         line_width: 1
         padding: [dp(14), dp(10), dp(14), dp(10)]
         elevation: 0
@@ -261,31 +265,43 @@
                     spacing: dp(8)
 
                     MDFillRoundFlatButton:
-                        text: "📊 ¿Qué hábito está en riesgo?"
+                        text: "¿Qué hábito está en riesgo?"
                         font_size: "10sp"
-                        md_bg_color: (0.12, 0.16, 0.23, 1)
+                        md_bg_color: app.card_item_bg
+                        line_color: app.card_border
+                        line_width: 1
                         text_color: app.text_primary
+                        elevation: 0
                         on_release: root.enviar_consulta_rapida("¿Qué hábito está en riesgo de abandono?")
 
                     MDFillRoundFlatButton:
-                        text: "🎯 Reajustar metas"
+                        text: "Reajustar metas"
                         font_size: "10sp"
-                        md_bg_color: (0.12, 0.16, 0.23, 1)
+                        md_bg_color: app.card_item_bg
+                        line_color: app.card_border
+                        line_width: 1
                         text_color: app.text_primary
+                        elevation: 0
                         on_release: root.enviar_consulta_rapida("¿Cómo reajusto mis metas para no desertar?")
 
                     MDFillRoundFlatButton:
-                        text: "🔥 Salvar racha"
+                        text: "Salvar racha"
                         font_size: "10sp"
-                        md_bg_color: (0.12, 0.16, 0.23, 1)
+                        md_bg_color: app.card_item_bg
+                        line_color: app.card_border
+                        line_width: 1
                         text_color: app.text_primary
+                        elevation: 0
                         on_release: root.enviar_consulta_rapida("¿Cómo recupero mi racha si fallé un día?")
 
                     MDFillRoundFlatButton:
-                        text: "⚡ Regla de 2 min"
+                        text: "Regla de 2 min"
                         font_size: "10sp"
-                        md_bg_color: (0.12, 0.16, 0.23, 1)
+                        md_bg_color: app.card_item_bg
+                        line_color: app.card_border
+                        line_width: 1
                         text_color: app.text_primary
+                        elevation: 0
                         on_release: root.enviar_consulta_rapida("Explícame la regla de los 2 minutos")
 
             # Historial del Chat (ScrollView)

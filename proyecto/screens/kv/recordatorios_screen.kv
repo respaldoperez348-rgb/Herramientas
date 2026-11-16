@@ -94,13 +94,16 @@
         height: dp(26)
         spacing: dp(10)
 
-        MDFillRoundFlatButton:
+        MDRoundFlatIconButton:
+            icon: "bell-ring-outline"
             text: "Probar Alarma"
             font_size: "10sp"
             size_hint: None, None
-            size: dp(110), dp(24)
-            md_bg_color: (app.color_acento[0], app.color_acento[1], app.color_acento[2], 0.16)
-            text_color: app.color_acento
+            size: dp(125), dp(26)
+            line_color: app.card_border
+            line_width: 1
+            text_color: app.text_primary
+            icon_color: app.color_acento
             on_release: root.probar_alarma()
 
         Widget:
@@ -109,7 +112,7 @@
             icon: "trash-can-outline"
             user_font_size: "18sp"
             theme_text_color: "Custom"
-            text_color: 0.9, 0.35, 0.35, 1
+            text_color: (0.75, 0.40, 0.40, 1)
             size_hint: None, None
             size: dp(26), dp(26)
             on_release: root.eliminar_recordatorio()

@@ -68,7 +68,7 @@ class FormularioNuevaMeta(MDBoxLayout):
         self.orientation = 'vertical'
         self.spacing = "12dp"
         self.size_hint_y = None
-        self.height = "260dp"
+        self.height = "290dp"
 
         self.habitos = lista_habitos
         self.habito_seleccionado_id = self.habitos[0]['id'] if self.habitos else 1

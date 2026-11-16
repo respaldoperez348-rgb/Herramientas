@@ -98,13 +98,13 @@
                         size_hint: None, None
                         size: dp(240), dp(240)
                         canvas:
-                            # Fondo del anillo
+                            # Fondo del anillo adaptativo
                             Color:
-                                rgba: 0.11, 0.14, 0.20, 1
+                                rgba: app.track_bg
                             Line:
                                 circle: (self.center_x, self.center_y, dp(105))
                                 width: dp(10)
-                            # Progreso del anillo en coral
+                            # Progreso del anillo en color de acento
                             Color:
                                 rgba: app.color_acento
                             Line:
@@ -124,7 +124,7 @@
                             icon: root.icono_habito
                             font_size: "26sp"
                             theme_text_color: "Custom"
-                            text_color: app.text_primary
+                            text_color: app.color_acento
                             halign: "center"
                             size_hint_y: None
                             height: dp(30)
@@ -158,79 +158,39 @@
                             size_hint_y: None
                             height: dp(18)
 
-                # Botones de Acción: Pausar / Iniciar y Finalizar
+                # Botones de Acción: Pausar / Iniciar y Finalizar (Sin colapso vertical)
                 BoxLayout:
                     orientation: 'horizontal'
                     size_hint_y: None
                     height: dp(44)
-                    spacing: dp(16)
+                    spacing: dp(14)
                     pos_hint: {'center_x': 0.5}
                     size_hint_x: None
-                    width: dp(280)
+                    width: dp(300)
 
-                    # Botón Pausar / Continuar
-                    MDCard:
+                    MDFillRoundFlatIconButton:
+                        icon: "pause" if root.temporizador_activo else "play"
+                        text: "Pausar" if root.temporizador_activo else "Iniciar"
+                        font_size: "13sp"
                         size_hint: 0.5, 1
-                        radius: [dp(22), dp(22), dp(22), dp(22)]
                         md_bg_color: app.color_acento
+                        text_color: 1, 1, 1, 1
+                        icon_color: 1, 1, 1, 1
                         elevation: 0
-                        ripple_behavior: True
                         on_release: root.toggle_temporizador()
 
-                        BoxLayout:
-                            orientation: 'horizontal'
-                            spacing: dp(6)
-                            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-                            size_hint: None, None
-                            size: self.minimum_size
-
-                            MDIcon:
-                                icon: "pause" if root.temporizador_activo else "play"
-                                font_size: "18sp"
-                                theme_text_color: "Custom"
-                                text_color: 1, 1, 1, 1
-                                pos_hint: {'center_y': 0.5}
-
-                            MDLabel:
-                                text: "Pausar" if root.temporizador_activo else "Iniciar"
-                                font_style: "Button"
-                                bold: True
-                                theme_text_color: "Custom"
-                                text_color: 1, 1, 1, 1
-                                pos_hint: {'center_y': 0.5}
-
-                    # Botón Finalizar
-                    MDCard:
+                    MDFillRoundFlatIconButton:
+                        icon: "stop"
+                        text: "Finalizar"
+                        font_size: "13sp"
                         size_hint: 0.5, 1
-                        radius: [dp(22), dp(22), dp(22), dp(22)]
-                        md_bg_color: (0.12, 0.16, 0.23, 1)
+                        md_bg_color: app.card_item_bg
+                        text_color: app.text_primary
+                        icon_color: app.text_primary
                         line_color: app.card_border
                         line_width: 1
                         elevation: 0
-                        ripple_behavior: True
                         on_release: root.detener_temporizador()
-
-                        BoxLayout:
-                            orientation: 'horizontal'
-                            spacing: dp(6)
-                            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-                            size_hint: None, None
-                            size: self.minimum_size
-
-                            MDIcon:
-                                icon: "stop"
-                                font_size: "16sp"
-                                theme_text_color: "Custom"
-                                text_color: app.text_primary
-                                pos_hint: {'center_y': 0.5}
-
-                            MDLabel:
-                                text: "Finalizar"
-                                font_style: "Button"
-                                bold: True
-                                theme_text_color: "Custom"
-                                text_color: app.text_primary
-                                pos_hint: {'center_y': 0.5}
 
                 # Sección Inferior: Gráfico de Actividad Semanal + Métricas Rápidas
                 BoxLayout:
