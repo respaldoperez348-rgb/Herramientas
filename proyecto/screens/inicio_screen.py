@@ -37,13 +37,17 @@ class HabitCard(MDCard):
     habit_id = None
     nombre = StringProperty("")
     descripcion = StringProperty("")
+    progreso_texto = StringProperty("0 / 30 min")
+    progreso_porcentaje = NumericProperty(0)
+    porcentaje_label = StringProperty("0%")
+    icono = StringProperty("check-circle-outline")
+    categoria = StringProperty("Salud")
+    completado_hoy = BooleanProperty(False)
     sesiones = NumericProperty(0)
     racha = NumericProperty(0)
     total_min = NumericProperty(0)
     objetivo = NumericProperty(30)
-    categoria = StringProperty("Salud")
     horario = StringProperty("07:00 PM")
-    completado_hoy = BooleanProperty(False)
 
     def __init__(self, **kwargs):
         self.habit_id = kwargs.pop('habit_id', None)
@@ -59,6 +63,9 @@ class HabitCard(MDCard):
         cat_val = kwargs.pop('categoria', "Salud")
         horario_val = kwargs.pop('horario', "07:00 PM")
         completado_val = kwargs.pop('completado_hoy', False)
+        icono_val = kwargs.pop('icono', "")
+        prog_txt_val = kwargs.pop('progreso_texto', "")
+        porc_val = kwargs.pop('progreso_porcentaje', 0)
 
         super().__init__(**kwargs)
 
@@ -72,16 +79,65 @@ class HabitCard(MDCard):
         self.horario = horario_val
         self.completado_hoy = completado_val
 
+        # Icono según categoría o personalizado
+        if icono_val:
+            self.icono = icono_val
+        else:
+            cat_lower = cat_val.lower()
+            if "agua" in nombre_val.lower() or "hidra" in cat_lower:
+                self.icono = "water"
+            elif "lect" in nombre_val.lower() or "estudio" in cat_lower:
+                self.icono = "book-open-page-variant"
+            elif "entrena" in nombre_val.lower() or "gym" in nombre_val.lower() or "deporte" in cat_lower:
+                self.icono = "dumbbell"
+            elif "python" in nombre_val.lower() or "código" in nombre_val.lower() or "prog" in cat_lower:
+                self.icono = "xml"
+            else:
+                self.icono = "check-circle-outline"
+
+        # Progreso texto y porcentaje
+        if prog_txt_val:
+            self.progreso_texto = prog_txt_val
+            self.progreso_porcentaje = porc_val
+            self.porcentaje_label = f"{int(porc_val)}%"
+        else:
+            if self.completado_hoy:
+                self.progreso_porcentaje = 100
+                self.porcentaje_label = "100%"
+                if "agua" in self.nombre.lower():
+                    self.progreso_texto = "8 / 8 vasos"
+                else:
+                    self.progreso_texto = f"{self.objetivo} / {self.objetivo} min"
+            else:
+                self.progreso_porcentaje = 0
+                self.porcentaje_label = "0%"
+                if "agua" in self.nombre.lower():
+                    self.progreso_texto = "0 / 8 vasos"
+                else:
+                    self.progreso_texto = f"0 / {self.objetivo} min"
+
     def toggle_check(self):
         self.completado_hoy = not self.completado_hoy
         if self.completado_hoy:
             self.sesiones += 1
             self.racha += 1
             self.total_min += self.objetivo
+            self.progreso_porcentaje = 100
+            self.porcentaje_label = "100%"
+            if "agua" in self.nombre.lower():
+                self.progreso_texto = "8 / 8 vasos"
+            else:
+                self.progreso_texto = f"{self.objetivo} / {self.objetivo} min"
         else:
             self.sesiones = max(0, self.sesiones - 1)
             self.racha = max(0, self.racha - 1)
             self.total_min = max(0, self.total_min - self.objetivo)
+            self.progreso_porcentaje = 0
+            self.porcentaje_label = "0%"
+            if "agua" in self.nombre.lower():
+                self.progreso_texto = "0 / 8 vasos"
+            else:
+                self.progreso_texto = f"0 / {self.objetivo} min"
 
         if self.inicio_screen:
             self.inicio_screen.actualizar_estado_habito(
@@ -220,39 +276,63 @@ class InicioScreen(MDScreen):
     _habitos_demo = [
         {
             "id": 1,
-            "nombre": "Beber 2L de agua",
-            "descripcion": "Meta diaria de hidratación",
+            "nombre": "Beber agua",
+            "descripcion": "8 vasos de agua pura al día",
             "total_sesiones": 5,
             "racha_dias": 5,
             "total_segundos": 9000,
             "objetivo_diario_minutos": 30,
             "categoria": "Salud",
             "horario": "08:00 AM",
-            "completado_hoy": True
+            "completado_hoy": True,
+            "progreso_texto": "8 / 8 vasos",
+            "progreso_porcentaje": 100,
+            "icono": "water"
         },
         {
             "id": 2,
-            "nombre": "Lectura técnica de código",
-            "descripcion": "Libros de arquitectura y patrones",
-            "total_sesiones": 3,
-            "racha_dias": 3,
+            "nombre": "Lectura técnica",
+            "descripcion": "Leer y profundizar en temas técnicos relevantes.",
+            "total_sesiones": 5,
+            "racha_dias": 5,
             "total_segundos": 5400,
-            "objetivo_diario_minutos": 45,
+            "objetivo_diario_minutos": 30,
             "categoria": "Estudio",
             "horario": "07:00 PM",
-            "completado_hoy": False
+            "completado_hoy": True,
+            "progreso_texto": "30 / 30 min",
+            "progreso_porcentaje": 100,
+            "icono": "book-open-page-variant"
         },
         {
             "id": 3,
-            "nombre": "Rutina de entrenamiento",
+            "nombre": "Entrenamiento",
             "descripcion": "Fuerza y movilidad",
             "total_sesiones": 4,
             "racha_dias": 4,
             "total_segundos": 7200,
-            "objetivo_diario_minutos": 45,
+            "objetivo_diario_minutos": 60,
             "categoria": "Deporte",
             "horario": "06:30 PM",
-            "completado_hoy": True
+            "completado_hoy": True,
+            "progreso_texto": "45 / 60 min",
+            "progreso_porcentaje": 75,
+            "icono": "dumbbell"
+        },
+        {
+            "id": 4,
+            "nombre": "Estudiar Python",
+            "descripcion": "Algoritmos y desarrollo backend",
+            "total_sesiones": 0,
+            "racha_dias": 0,
+            "total_segundos": 0,
+            "objetivo_diario_minutos": 45,
+            "categoria": "Programación",
+            "horario": "09:00 PM",
+            "completado_hoy": False,
+            "progreso_texto": "0 / 45 min",
+            "progreso_porcentaje": 0,
+            "icono": "xml"
         }
     ]
 
@@ -381,6 +461,9 @@ class InicioScreen(MDScreen):
                         categoria=habit.get('categoria', 'Salud'),
                         horario=habit.get('horario', '07:00 PM'),
                         completado_hoy=habit.get('completado_hoy', False),
+                        icono=habit.get('icono', ''),
+                        progreso_texto=habit.get('progreso_texto', ''),
+                        progreso_porcentaje=habit.get('progreso_porcentaje', 100 if habit.get('completado_hoy') else 0),
                         app=self.app,
                         inicio_screen=self
                     )

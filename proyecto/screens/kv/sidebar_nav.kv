@@ -1,0 +1,213 @@
+#:kivy 2.0.0
+#:import dp kivy.metrics.dp
+
+<SidebarNav@MDBoxLayout>:
+    active_item: "inicio"
+    orientation: 'vertical'
+    size_hint_x: None
+    width: dp(200)
+    md_bg_color: app.nav_bg
+    padding: [dp(12), dp(16), dp(12), dp(16)]
+    spacing: dp(6)
+    canvas.after:
+        Color:
+            rgba: app.card_border
+        Line:
+            points: [self.right, self.y, self.right, self.top]
+            width: 1
+
+    # Header Logo HabitPulse
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: dp(50)
+        spacing: dp(10)
+        padding: [dp(8), dp(4), dp(8), dp(8)]
+
+        MDIcon:
+            icon: "chart-timeline-variant"
+            font_size: "24sp"
+            theme_text_color: "Custom"
+            text_color: app.color_acento
+            size_hint_x: None
+            width: dp(28)
+            pos_hint: {'center_y': 0.5}
+
+        MDLabel:
+            text: "HabitPulse"
+            font_style: "H6"
+            bold: True
+            theme_text_color: "Custom"
+            text_color: app.text_primary
+            pos_hint: {'center_y': 0.5}
+
+    Widget:
+        size_hint_y: None
+        height: dp(12)
+
+    # 1. Botón: Inicio
+    MDCard:
+        size_hint_y: None
+        height: dp(42)
+        radius: [dp(10), dp(10), dp(10), dp(10)]
+        md_bg_color: (app.color_acento[0], app.color_acento[1], app.color_acento[2], 0.18) if root.active_item == "inicio" else (0, 0, 0, 0)
+        padding: [dp(14), 0, dp(14), 0]
+        ripple_behavior: True
+        elevation: 0
+        on_release:
+            if root.active_item != "inicio": app.cambiar_pantalla('inicio', 'right')
+
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: dp(12)
+
+            MDIcon:
+                icon: "home" if root.active_item == "inicio" else "home-outline"
+                font_size: "20sp"
+                theme_text_color: "Custom"
+                text_color: app.color_acento if root.active_item == "inicio" else app.text_secondary
+                size_hint_x: None
+                width: dp(24)
+                pos_hint: {'center_y': 0.5}
+
+            MDLabel:
+                text: "Inicio"
+                font_style: "Subtitle2"
+                bold: True if root.active_item == "inicio" else False
+                theme_text_color: "Custom"
+                text_color: app.text_primary if root.active_item == "inicio" else app.text_secondary
+                pos_hint: {'center_y': 0.5}
+
+    # 2. Botón: Metas
+    MDCard:
+        size_hint_y: None
+        height: dp(42)
+        radius: [dp(10), dp(10), dp(10), dp(10)]
+        md_bg_color: (app.color_acento[0], app.color_acento[1], app.color_acento[2], 0.18) if root.active_item == "metas" else (0, 0, 0, 0)
+        padding: [dp(14), 0, dp(14), 0]
+        ripple_behavior: True
+        elevation: 0
+        on_release:
+            if root.active_item != "metas": app.cambiar_pantalla('metas', 'left' if root.active_item == 'inicio' else 'right')
+
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: dp(12)
+
+            MDIcon:
+                icon: "bullseye-arrow"
+                font_size: "20sp"
+                theme_text_color: "Custom"
+                text_color: app.color_acento if root.active_item == "metas" else app.text_secondary
+                size_hint_x: None
+                width: dp(24)
+                pos_hint: {'center_y': 0.5}
+
+            MDLabel:
+                text: "Metas"
+                font_style: "Subtitle2"
+                bold: True if root.active_item == "metas" else False
+                theme_text_color: "Custom"
+                text_color: app.text_primary if root.active_item == "metas" else app.text_secondary
+                pos_hint: {'center_y': 0.5}
+
+    # 3. Botón: Asistente
+    MDCard:
+        size_hint_y: None
+        height: dp(42)
+        radius: [dp(10), dp(10), dp(10), dp(10)]
+        md_bg_color: (app.color_acento[0], app.color_acento[1], app.color_acento[2], 0.18) if root.active_item == "asistente" else (0, 0, 0, 0)
+        padding: [dp(14), 0, dp(14), 0]
+        ripple_behavior: True
+        elevation: 0
+        on_release:
+            if root.active_item != "asistente": app.cambiar_pantalla('asistente', 'left' if root.active_item in ['inicio', 'metas'] else 'right')
+
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: dp(12)
+
+            MDIcon:
+                icon: "creation"
+                font_size: "20sp"
+                theme_text_color: "Custom"
+                text_color: app.color_acento if root.active_item == "asistente" else app.text_secondary
+                size_hint_x: None
+                width: dp(24)
+                pos_hint: {'center_y': 0.5}
+
+            MDLabel:
+                text: "Asistente"
+                font_style: "Subtitle2"
+                bold: True if root.active_item == "asistente" else False
+                theme_text_color: "Custom"
+                text_color: app.text_primary if root.active_item == "asistente" else app.text_secondary
+                pos_hint: {'center_y': 0.5}
+
+    # 4. Botón: Recordatorios
+    MDCard:
+        size_hint_y: None
+        height: dp(42)
+        radius: [dp(10), dp(10), dp(10), dp(10)]
+        md_bg_color: (app.color_acento[0], app.color_acento[1], app.color_acento[2], 0.18) if root.active_item == "recordatorios" else (0, 0, 0, 0)
+        padding: [dp(14), 0, dp(14), 0]
+        ripple_behavior: True
+        elevation: 0
+        on_release:
+            if root.active_item != "recordatorios": app.cambiar_pantalla('recordatorios', 'left' if root.active_item in ['inicio', 'metas', 'asistente'] else 'right')
+
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: dp(12)
+
+            MDIcon:
+                icon: "bell-ring" if root.active_item == "recordatorios" else "bell-outline"
+                font_size: "20sp"
+                theme_text_color: "Custom"
+                text_color: app.color_acento if root.active_item == "recordatorios" else app.text_secondary
+                size_hint_x: None
+                width: dp(24)
+                pos_hint: {'center_y': 0.5}
+
+            MDLabel:
+                text: "Recordatorios"
+                font_style: "Subtitle2"
+                bold: True if root.active_item == "recordatorios" else False
+                theme_text_color: "Custom"
+                text_color: app.text_primary if root.active_item == "recordatorios" else app.text_secondary
+                pos_hint: {'center_y': 0.5}
+
+    # 5. Botón: Perfil
+    MDCard:
+        size_hint_y: None
+        height: dp(42)
+        radius: [dp(10), dp(10), dp(10), dp(10)]
+        md_bg_color: (app.color_acento[0], app.color_acento[1], app.color_acento[2], 0.18) if root.active_item == "perfil" else (0, 0, 0, 0)
+        padding: [dp(14), 0, dp(14), 0]
+        ripple_behavior: True
+        elevation: 0
+        on_release:
+            if root.active_item != "perfil": app.cambiar_pantalla('perfil', 'left')
+
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: dp(12)
+
+            MDIcon:
+                icon: "account-circle" if root.active_item == "perfil" else "account-outline"
+                font_size: "20sp"
+                theme_text_color: "Custom"
+                text_color: app.color_acento if root.active_item == "perfil" else app.text_secondary
+                size_hint_x: None
+                width: dp(24)
+                pos_hint: {'center_y': 0.5}
+
+            MDLabel:
+                text: "Perfil"
+                font_style: "Subtitle2"
+                bold: True if root.active_item == "perfil" else False
+                theme_text_color: "Custom"
+                text_color: app.text_primary if root.active_item == "perfil" else app.text_secondary
+                pos_hint: {'center_y': 0.5}
+
+    Widget:

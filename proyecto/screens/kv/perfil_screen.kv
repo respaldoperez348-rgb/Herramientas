@@ -122,69 +122,46 @@
         shorten: True
 
 <PerfilScreen>:
-    FloatLayout:
-        # Fondo dinámico reactivo al modo oscuro/claro
-        canvas.before:
-            Color:
-                rgba: app.bg_app
-            Rectangle:
-                pos: self.pos
-                size: self.size
-            Color:
-                rgba: app.color_acento[0], app.color_acento[1], app.color_acento[2], 0.03
-            Ellipse:
-                pos: self.width * 0.1, self.height * 0.70
-                size: self.width * 0.8, self.width * 0.8
+    md_bg_color: app.bg_app
 
-        # Header Superior Minimalista
-        BoxLayout:
-            orientation: 'horizontal'
-            size_hint: 0.92, None
-            height: dp(50)
-            pos_hint: {'center_x': 0.5, 'top': 0.98}
-            spacing: dp(8)
+    BoxLayout:
+        orientation: 'horizontal'
 
-            MDIconButton:
-                icon: "arrow-left"
-                theme_text_color: "Custom"
-                text_color: app.text_primary
-                pos_hint: {'center_y': 0.5}
-                size_hint: None, None
-                size: dp(36), dp(36)
-                on_release: root.volver()
+        # Sidebar de Navegación Fijo (Izquierda)
+        SidebarNav:
+            active_item: "perfil"
 
-            BoxLayout:
-                orientation: 'vertical'
-                pos_hint: {'center_y': 0.5}
-                spacing: 0
-
-                MDLabel:
-                    text: "CUENTA"
-                    font_size: "9sp"
-                    bold: True
-                    theme_text_color: "Custom"
-                    text_color: app.text_secondary
-
-                MDLabel:
-                    text: "Configuración de Perfil"
-                    font_style: "Subtitle1"
-                    bold: True
-                    theme_text_color: "Custom"
-                    text_color: app.text_primary
-
-        # Contenido Scrolleable
+        # Contenido Principal: Perfil y Ajustes
         ScrollView:
             effect_cls: ScrollEffect
             do_scroll_x: False
-            size_hint: 0.92, 0.89
-            pos_hint: {'center_x': 0.5, 'top': 0.91}
 
             BoxLayout:
                 orientation: 'vertical'
-                spacing: dp(14)
+                spacing: dp(16)
                 size_hint_y: None
                 height: self.minimum_height
-                padding: [0, dp(4), 0, dp(24)]
+                padding: [dp(32), dp(24), dp(36), dp(32)]
+
+                # Header Superior
+                BoxLayout:
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: dp(52)
+                    spacing: dp(2)
+
+                    MDLabel:
+                        text: "Configuración de Perfil"
+                        font_style: "H4"
+                        bold: True
+                        theme_text_color: "Custom"
+                        text_color: app.text_primary
+
+                    MDLabel:
+                        text: "Gestiona tu identidad, logros, apariencia y cuenta"
+                        font_style: "Subtitle2"
+                        theme_text_color: "Custom"
+                        text_color: app.text_secondary
 
                 # ================= 1. TARJETA RESUMEN DE PERFIL =================
                 MDCard:

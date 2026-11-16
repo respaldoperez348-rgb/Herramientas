@@ -5,6 +5,7 @@ from kivymd.uix.button import MDFlatButton, MDRaisedButton
 from kivymd.uix.textfield import MDTextField
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.list import OneLineListItem
 from kivy.properties import StringProperty, NumericProperty, ListProperty
 from datetime import datetime, timedelta
 
@@ -96,7 +97,7 @@ class FormularioNuevaMeta(MDBoxLayout):
             {
                 "text": h['nombre'],
                 "viewclass": "OneLineListItem",
-                "on_release": lambda x=h: self.seleccionar_habito(x),
+                "on_release": lambda *args, hab=h: self.seleccionar_habito(hab),
             } for h in self.habitos
         ] if self.habitos else []
         self.menu_habitos = MDDropdownMenu(
@@ -336,13 +337,16 @@ class MetasScreen(MDScreen):
             if self.dialog:
                 self.dialog.dismiss()
 
+        color_btn = self.app.color_acento if self.app and hasattr(self.app, 'color_acento') else (0.88, 0.11, 0.28, 1)
+
         self.dialog = MDDialog(
             title="Nueva Meta de Hábito",
             type="custom",
             content_cls=self.form_nueva_meta,
+            size_hint=(0.48, None),
             buttons=[
                 MDFlatButton(text="Cancelar", on_release=lambda x: self.dialog.dismiss()),
-                MDRaisedButton(text="Crear Meta", md_bg_color=(0, 0.7, 0.9, 1), on_release=_guardar)
+                MDRaisedButton(text="Crear Meta", md_bg_color=color_btn, on_release=_guardar)
             ]
         )
         self.dialog.open()

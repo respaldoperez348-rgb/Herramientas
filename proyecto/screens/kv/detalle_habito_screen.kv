@@ -1,467 +1,531 @@
 #:kivy 2.0.0
-#:import dp kivy.metrics.dp
 #:import ScrollEffect kivy.effects.scroll.ScrollEffect
+#:import dp kivy.metrics.dp
 
 <DetalleHabitoScreen>:
-    ScrollView:
-        effect_cls: ScrollEffect
-        do_scroll_x: False
-        
-        FloatLayout:
-            size_hint_y: None
-            height: dp(1070) 
-            
-            # Header con botón volver y título - POSICIÓN FIJA
+    md_bg_color: app.bg_app
+
+    BoxLayout:
+        orientation: 'horizontal'
+
+        # Sidebar de Navegación Fijo (Izquierda)
+        SidebarNav:
+            active_item: "inicio"
+
+        # ==========================================
+        # 2. CONTENIDO PRINCIPAL: TEMPORIZADOR Y STATS
+        # ==========================================
+        ScrollView:
+            effect_cls: ScrollEffect
+            do_scroll_x: False
+
             BoxLayout:
-                orientation: 'horizontal'
-                size_hint: 0.9, None
-                height: dp(60)
-                pos_hint: {'center_x': 0.5, 'top': 0.99}
-                spacing: dp(10)
-                
-                MDIconButton:
-                    icon: "arrow-left"
-                    theme_text_color: "Custom"
-                    text_color: 0, 0.97, 1, 1
-                    on_release: root.volver_atras()
-                
-                BoxLayout:
-                    orientation: 'vertical'
-                    spacing: dp(2)
-                    
-                    MDLabel:
-                        id: nombre_habito
-                        text: "Nombre del Hábito"
-                        font_style: "H6"
-                        bold: True
-                        theme_text_color: "Custom"
-                        text_color: 1, 1, 1, 1
-                        size_hint_y: None
-                        height: dp(15)
-                        halign: "left"
-                    
-                    MDLabel:
-                        id: descripcion_habito
-                        text: ""
-                        font_style: "Caption"
-                        theme_text_color: "Custom"
-                        text_color: 0.7, 0.7, 0.7, 1
-                        size_hint_y: None
-                        height: dp(20)
-                        halign: "left"
-            
-            # Barra de progreso diario - POSICIÓN FIJA
-            MDCard:
-                size_hint: 0.9, None
-                height: dp(120)
-                pos_hint: {'center_x': 0.5, 'top': 0.91}
                 orientation: 'vertical'
-                padding: dp(20)
-                spacing: dp(15)
-                radius: dp(15)
-                md_bg_color: 0.12, 0.16, 0.23, 1
-                elevation: 10
-                
-                MDLabel:
-                    text: "Progreso Diario"
-                    font_style: "H6"
-                    bold: True
-                    theme_text_color: "Custom"
-                    text_color: 1, 1, 1, 1
-                    size_hint_y: None
-                    height: dp(25)
-                
-                BoxLayout:
-                    orientation: 'horizontal'
-                    size_hint_y: None
-                    height: dp(25)
-                    
-                    MDLabel:
-                        id: progreso_minutos
-                        text: "0/30 min"
-                        font_style: "Subtitle1"
-                        theme_text_color: "Custom"
-                        text_color: 0.7, 0.7, 0.7, 1
-                        size_hint_x: 0.6
-                    
-                    MDLabel:
-                        id: progreso_texto
-                        text: "0%"
-                        font_style: "H6"
-                        bold: True
-                        halign: "right"
-                        theme_text_color: "Custom"
-                        text_color: 0, 0.97, 1, 1
-                        size_hint_x: 0.4
-                
-                ProgressBar:
-                    id: barra_progreso
-                    max: 100
-                    value: 0
-                    size_hint_y: None
-                    height: dp(10)
-            
-            # Sección de estadísticas - POSICIÓN FIJA
-            MDCard:
-                size_hint: 0.9, None
-                height: dp(250)
-                pos_hint: {'center_x': 0.5, 'top': 0.75}
-                orientation: 'vertical'
-                padding: dp(25)
-                spacing: dp(18)
-                radius: dp(15)
-                md_bg_color: 0.12, 0.16, 0.23, 1
-                elevation: 10
-                
-                MDLabel:
-                    text: "Estadísticas"
-                    font_style: "H6"
-                    bold: True
-                    theme_text_color: "Custom"
-                    text_color: 1, 1, 1, 1
-                    size_hint_y: None
-                    height: dp(50)
-                
-                # Grid de estadísticas
-                GridLayout:
-                    cols: 2
-                    spacing: dp(25)
-                    size_hint_y: None
-                    height: dp(200)
-                    
-                    # Tarjeta Hoy
-                    MDCard:
-                        orientation: 'vertical'
-                        padding: dp(12)
-                        spacing: dp(5)
-                        radius: dp(12)
-                        md_bg_color: 0.15, 0.2, 0.28, 1
-                        
-                        MDLabel:
-                            text: "Hoy"
-                            font_style: "Subtitle1"
-                            theme_text_color: "Custom"
-                            text_color: 0.16, 0.73, 0.51, 1
-                            size_hint_y: None
-                            height: dp(20)
-                            halign: "center"
-                            bold: True
-                        
-                        MDLabel:
-                            id: hoy_valor
-                            text: "0m"
-                            font_style: "H5"
-                            bold: True
-                            theme_text_color: "Custom"
-                            text_color: 1, 1, 1, 1
-                            size_hint_y: None
-                            height: dp(40)
-                            halign: "center"
-                        
-                        MDLabel:
-                            text: "Minutos hoy"
-                            font_style: "Caption"
-                            theme_text_color: "Custom"
-                            text_color: 0.6, 0.6, 0.6, 1
-                            size_hint_y: None
-                            height: dp(20)
-                            halign: "center"
-                    
-                    # Tarjeta Total
-                    MDCard:
-                        orientation: 'vertical'
-                        padding: dp(12)
-                        spacing: dp(5)
-                        radius: dp(12)
-                        md_bg_color: 0.15, 0.2, 0.28, 1
-                        
-                        MDLabel:
-                            text: "Total"
-                            font_style: "Subtitle1"
-                            theme_text_color: "Custom"
-                            text_color: 0.23, 0.51, 0.96, 1
-                            size_hint_y: None
-                            height: dp(20)
-                            halign: "center"
-                            bold: True
-                        
-                        MDLabel:
-                            id: total_valor
-                            text: "0m"
-                            font_style: "H5"
-                            bold: True
-                            theme_text_color: "Custom"
-                            text_color: 1, 1, 1, 1
-                            size_hint_y: None
-                            height: dp(40)
-                            halign: "center"
-                        
-                        MDLabel:
-                            text: "Minutos total"
-                            font_style: "Caption"
-                            theme_text_color: "Custom"
-                            text_color: 0.6, 0.6, 0.6, 1
-                            size_hint_y: None
-                            height: dp(20)
-                            halign: "center"
-                    
-                    # Tarjeta Racha
-                    MDCard:
-                        orientation: 'vertical'
-                        padding: dp(12)
-                        spacing: dp(5)
-                        radius: dp(12)
-                        md_bg_color: 0.15, 0.2, 0.28, 1
-                        
-                        MDLabel:
-                            text: "Racha"
-                            font_style: "Subtitle1"
-                            theme_text_color: "Custom"
-                            text_color: 1, 0.65, 0, 1
-                            size_hint_y: None
-                            height: dp(20)
-                            halign: "center"
-                            bold: True
-                        
-                        MDLabel:
-                            id: racha_valor
-                            text: "0d"
-                            font_style: "H5"
-                            bold: True
-                            theme_text_color: "Custom"
-                            text_color: 1, 1, 1, 1
-                            size_hint_y: None
-                            height: dp(40)
-                            halign: "center"
-                        
-                        MDLabel:
-                            text: "Días seguidos"
-                            font_style: "Caption"
-                            theme_text_color: "Custom"
-                            text_color: 0.6, 0.6, 0.6, 1
-                            size_hint_y: None
-                            height: dp(20)
-                            halign: "center"
-                    
-                    # Tarjeta Promedio
-                    MDCard:
-                        orientation: 'vertical'
-                        padding: dp(12)
-                        spacing: dp(5)
-                        radius: dp(12)
-                        md_bg_color: 0.15, 0.2, 0.28, 1
-                        
-                        MDLabel:
-                            text: "Promedio"
-                            font_style: "Subtitle1"
-                            theme_text_color: "Custom"
-                            text_color: 0, 0.97, 1, 1
-                            size_hint_y: None
-                            height: dp(20)
-                            halign: "center"
-                            bold: True
-                        
-                        MDLabel:
-                            id: promedio_valor
-                            text: "0m"
-                            font_style: "H5"
-                            bold: True
-                            theme_text_color: "Custom"
-                            text_color: 1, 1, 1, 1
-                            size_hint_y: None
-                            height: dp(40)
-                            halign: "center"
-                        
-                        MDLabel:
-                            text: "Por sesión"
-                            font_style: "Caption"
-                            theme_text_color: "Custom"
-                            text_color: 0.6, 0.6, 0.6, 1
-                            size_hint_y: None
-                            height: dp(20)
-                            halign: "center"
-            
-            # Sección de temporizador - POSICIÓN FIJA
-            MDCard:
-                size_hint: 0.9, None
-                height: dp(190)
-                pos_hint: {'center_x': 0.5, 'top': 0.47}
-                orientation: 'vertical'
-                padding: dp(25)
-                spacing: dp(18)
-                radius: dp(15)
-                md_bg_color: 0.12, 0.16, 0.23, 1
-                elevation: 10
-                
-                MDLabel:
-                    text: "Temporizador de Sesión"
-                    font_style: "H6"
-                    bold: True
-                    theme_text_color: "Custom"
-                    text_color: 1, 1, 1, 1
-                    size_hint_y: None
-                    height: dp(35)
-                
-                # Display del tiempo
-                MDCard:
-                    orientation: 'vertical'
-                    padding: dp(10)
-                    radius: dp(10)
-                    md_bg_color: 0.15, 0.2, 0.28, 1
-                    size_hint_y: None
-                    height: dp(80)
-                    
-                    MDLabel:
-                        id: display_tiempo
-                        text: "00:00:00"
-                        font_style: "H4"
-                        bold: True
-                        halign: "center"
-                        theme_text_color: "Custom"
-                        text_color: 0, 0.97, 1, 1
-                        size_hint_y: None
-                        height: dp(60)
-                        valign: "middle"
-                
-                # Botones del temporizador
-                BoxLayout:
-                    orientation: 'horizontal'
-                    spacing: dp(15)
-                    size_hint_y: None
-                    height: dp(50)
-                    
-                    MDRaisedButton:
-                        id: boton_iniciar
-                        text: "COMENZAR SESIÓN"
-                        md_bg_color: 0, 0.97, 1, 1
-                        size_hint_x: 0.6
-                        font_style: "Button"
-                        theme_text_color: "Custom"
-                        text_color: 0, 0, 0, 1
-                        on_release: root.iniciar_temporizador()
-                    
-                    MDRaisedButton:
-                        id: boton_detener
-                        text: "FINALIZAR"
-                        md_bg_color: 1, 0.3, 0.3, 1
-                        size_hint_x: 0.4
-                        disabled: True
-                        font_style: "Button"
-                        theme_text_color: "Custom"
-                        text_color: 1, 1, 1, 1
-                        on_release: root.detener_temporizador()
-            
-            # Sección de recordatorio - POSICIÓN FIJA
-            MDCard:
-                size_hint: 0.9, None
-                height: dp(220)
-                pos_hint: {'center_x': 0.5, 'top': 0.23}
-                orientation: 'vertical'
-                padding: dp(25)
-                spacing: dp(18)
-                radius: dp(15)
-                md_bg_color: 0.12, 0.16, 0.23, 1
-                elevation: 10
-                
-                MDLabel:
-                    text: "Recordatorio"
-                    font_style: "H6"
-                    bold: True
-                    theme_text_color: "Custom"
-                    text_color: 1, 1, 1, 1
-                    size_hint_y: None
-                    height: dp(35)
-                
-                # Botones ACTIVAR/DESACTIVAR
-                BoxLayout:
-                    orientation: 'horizontal'
-                    spacing: dp(10)
-                    size_hint_y: None
-                    height: dp(40)
-                    
-                    MDFlatButton:
-                        id: boton_activar
-                        text: "ACTIVAR"
-                        theme_text_color: "Custom"
-                        text_color: 0.16, 0.73, 0.51, 1
-                        size_hint_x: 0.5
-                        font_style: "Button"
-                        bold: True
-                        on_release: root.activar_recordatorio(True)
-                    
-                    MDFlatButton:
-                        id: boton_desactivar
-                        text: "DESACTIVAR"
-                        theme_text_color: "Custom"
-                        text_color: 1, 0.3, 0.3, 1
-                        size_hint_x: 0.5
-                        font_style: "Button"
-                        bold: True
-                        on_release: root.activar_recordatorio(False)
-                
-                # Campos de hora
-                BoxLayout:
-                    orientation: 'horizontal'
-                    spacing: dp(15)
-                    size_hint_y: None
-                    height: dp(70)
-                    
-                    BoxLayout:
-                        orientation: 'vertical'
-                        spacing: dp(5)
-                        
-                        MDLabel:
-                            text: "Hora inicio"
-                            font_style: "Caption"
-                            theme_text_color: "Custom"
-                            text_color: 0.7, 0.7, 0.7, 1
-                            size_hint_y: None
-                            height: dp(20)
-                        
-                        MDTextField:
-                            id: campo_hora_inicio
-                            hint_text: "HH:MM"
-                            mode: "rectangle"
-                            size_hint_y: None
-                            height: dp(45)
-                            hint_text_color: 0.5, 0.5, 0.5, 1
-                            foreground_color: 1, 1, 1, 1
-                    
-                    BoxLayout:
-                        orientation: 'vertical'
-                        spacing: dp(5)
-                        
-                        MDLabel:
-                            text: "Hora fin"
-                            font_style: "Caption"
-                            theme_text_color: "Custom"
-                            text_color: 0.7, 0.7, 0.7, 1
-                            size_hint_y: None
-                            height: dp(20)
-                        
-                        MDTextField:
-                            id: campo_hora_fin
-                            hint_text: "HH:MM"
-                            mode: "rectangle"
-                            size_hint_y: None
-                            height: dp(45)
-                            hint_text_color: 0.5, 0.5, 0.5, 1
-                            foreground_color: 1, 1, 1, 1
-                
-                # Botón Guardar Horario
-                MDRaisedButton:
-                    text: "GUARDAR HORARIO"
-                    md_bg_color: 0.23, 0.51, 0.96, 1
-                    size_hint_y: None
-                    height: dp(48)
-                    font_style: "Button"
-                    theme_text_color: "Custom"
-                    text_color: 1, 1, 1, 1
-                    bold: True
-                    on_release: root.guardar_recordatorio()
-            
-            # Espacio al final para scroll
-            Widget:
                 size_hint_y: None
-                height: dp(50)
-                pos_hint: {'center_x': 0.5, 'y': 0.01}
+                height: self.minimum_height
+                padding: [dp(28), dp(20), dp(32), dp(24)]
+                spacing: dp(18)
+
+                # Header con botón atrás, badge de icono, título y opciones
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: dp(54)
+                    spacing: dp(14)
+
+                    MDIconButton:
+                        icon: "arrow-left"
+                        user_font_size: "22sp"
+                        theme_text_color: "Custom"
+                        text_color: app.text_primary
+                        pos_hint: {'center_y': 0.5}
+                        on_release: root.volver_atras()
+
+                    # Contenedor del Icono del Hábito
+                    MDCard:
+                        size_hint: None, None
+                        size: dp(44), dp(44)
+                        radius: [dp(10), dp(10), dp(10), dp(10)]
+                        md_bg_color: (app.color_acento[0], app.color_acento[1], app.color_acento[2], 0.16)
+                        elevation: 0
+                        pos_hint: {'center_y': 0.5}
+
+                        MDIcon:
+                            icon: root.icono_habito
+                            font_size: "22sp"
+                            theme_text_color: "Custom"
+                            text_color: app.color_acento
+                            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
+                    # Título y Subtítulo
+                    BoxLayout:
+                        orientation: 'vertical'
+                        spacing: dp(2)
+                        pos_hint: {'center_y': 0.5}
+
+                        MDLabel:
+                            text: root.nombre_habito_texto
+                            font_style: "H5"
+                            bold: True
+                            theme_text_color: "Custom"
+                            text_color: app.text_primary
+
+                        MDLabel:
+                            text: root.descripcion_habito_texto
+                            font_style: "Caption"
+                            theme_text_color: "Custom"
+                            text_color: app.text_secondary
+                            shorten: True
+                            shorten_from: 'right'
+
+                    # Opciones de Hábito (...)
+                    MDIconButton:
+                        icon: "dots-horizontal"
+                        user_font_size: "22sp"
+                        theme_text_color: "Custom"
+                        text_color: app.text_secondary
+                        pos_hint: {'center_y': 0.5}
+
+                # Anillo de Temporizador Central
+                FloatLayout:
+                    size_hint_y: None
+                    height: dp(270)
+
+                    # Canvas para anillo circular
+                    Widget:
+                        id: timer_canvas
+                        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                        size_hint: None, None
+                        size: dp(240), dp(240)
+                        canvas:
+                            # Fondo del anillo
+                            Color:
+                                rgba: 0.11, 0.14, 0.20, 1
+                            Line:
+                                circle: (self.center_x, self.center_y, dp(105))
+                                width: dp(10)
+                            # Progreso del anillo en coral
+                            Color:
+                                rgba: app.color_acento
+                            Line:
+                                circle: (self.center_x, self.center_y, dp(105), 90 - root.angulo_progreso, 90)
+                                width: dp(10)
+                                cap: 'round'
+
+                    # Texto e iconos dentro del anillo
+                    BoxLayout:
+                        orientation: 'vertical'
+                        size_hint: None, None
+                        size: dp(200), dp(170)
+                        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                        spacing: dp(3)
+
+                        MDIcon:
+                            icon: root.icono_habito
+                            font_size: "26sp"
+                            theme_text_color: "Custom"
+                            text_color: app.text_primary
+                            halign: "center"
+                            size_hint_y: None
+                            height: dp(30)
+
+                        MDLabel:
+                            text: root.enfoque_label
+                            font_size: "12sp"
+                            halign: "center"
+                            theme_text_color: "Custom"
+                            text_color: app.text_secondary
+                            size_hint_y: None
+                            height: dp(18)
+
+                        MDLabel:
+                            id: display_tiempo
+                            text: root.display_tiempo
+                            font_size: "40sp"
+                            bold: True
+                            halign: "center"
+                            theme_text_color: "Custom"
+                            text_color: app.text_primary
+                            size_hint_y: None
+                            height: dp(52)
+
+                        MDLabel:
+                            text: root.meta_label
+                            font_size: "12sp"
+                            halign: "center"
+                            theme_text_color: "Custom"
+                            text_color: app.text_secondary
+                            size_hint_y: None
+                            height: dp(18)
+
+                # Botones de Acción: Pausar / Iniciar y Finalizar
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: dp(44)
+                    spacing: dp(16)
+                    pos_hint: {'center_x': 0.5}
+                    size_hint_x: None
+                    width: dp(280)
+
+                    # Botón Pausar / Continuar
+                    MDCard:
+                        size_hint: 0.5, 1
+                        radius: [dp(22), dp(22), dp(22), dp(22)]
+                        md_bg_color: app.color_acento
+                        elevation: 0
+                        ripple_behavior: True
+                        on_release: root.toggle_temporizador()
+
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            spacing: dp(6)
+                            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                            size_hint: None, None
+                            size: self.minimum_size
+
+                            MDIcon:
+                                icon: "pause" if root.temporizador_activo else "play"
+                                font_size: "18sp"
+                                theme_text_color: "Custom"
+                                text_color: 1, 1, 1, 1
+                                pos_hint: {'center_y': 0.5}
+
+                            MDLabel:
+                                text: "Pausar" if root.temporizador_activo else "Iniciar"
+                                font_style: "Button"
+                                bold: True
+                                theme_text_color: "Custom"
+                                text_color: 1, 1, 1, 1
+                                pos_hint: {'center_y': 0.5}
+
+                    # Botón Finalizar
+                    MDCard:
+                        size_hint: 0.5, 1
+                        radius: [dp(22), dp(22), dp(22), dp(22)]
+                        md_bg_color: (0.12, 0.16, 0.23, 1)
+                        line_color: app.card_border
+                        line_width: 1
+                        elevation: 0
+                        ripple_behavior: True
+                        on_release: root.detener_temporizador()
+
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            spacing: dp(6)
+                            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                            size_hint: None, None
+                            size: self.minimum_size
+
+                            MDIcon:
+                                icon: "stop"
+                                font_size: "16sp"
+                                theme_text_color: "Custom"
+                                text_color: app.text_primary
+                                pos_hint: {'center_y': 0.5}
+
+                            MDLabel:
+                                text: "Finalizar"
+                                font_style: "Button"
+                                bold: True
+                                theme_text_color: "Custom"
+                                text_color: app.text_primary
+                                pos_hint: {'center_y': 0.5}
+
+                # Sección Inferior: Gráfico de Actividad Semanal + Métricas Rápidas
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: dp(170)
+                    spacing: dp(16)
+
+                    # Tarjeta Izquierda: Actividad semanal (Gráfico de Barras)
+                    MDCard:
+                        size_hint_x: 0.64
+                        radius: [dp(14), dp(14), dp(14), dp(14)]
+                        padding: [dp(18), dp(14), dp(18), dp(14)]
+                        spacing: dp(10)
+                        orientation: 'vertical'
+                        md_bg_color: app.card_bg
+                        line_color: app.card_border
+                        line_width: 1
+                        elevation: 0
+
+                        MDLabel:
+                            text: "Actividad semanal"
+                            font_style: "Subtitle2"
+                            bold: True
+                            theme_text_color: "Custom"
+                            text_color: app.text_primary
+                            size_hint_y: None
+                            height: dp(20)
+
+                        # Área del Gráfico: Eje Y + 7 Barras (Lun..Dom)
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            spacing: dp(12)
+
+                            # Eje Y con líneas de tiempo
+                            BoxLayout:
+                                orientation: 'vertical'
+                                size_hint_x: None
+                                width: dp(36)
+                                spacing: 0
+                                MDLabel:
+                                    text: "60 min"
+                                    font_size: "8sp"
+                                    theme_text_color: "Custom"
+                                    text_color: app.text_secondary
+                                MDLabel:
+                                    text: "45 min"
+                                    font_size: "8sp"
+                                    theme_text_color: "Custom"
+                                    text_color: app.text_secondary
+                                MDLabel:
+                                    text: "30 min"
+                                    font_size: "8sp"
+                                    theme_text_color: "Custom"
+                                    text_color: app.text_secondary
+                                MDLabel:
+                                    text: "15 min"
+                                    font_size: "8sp"
+                                    theme_text_color: "Custom"
+                                    text_color: app.text_secondary
+                                MDLabel:
+                                    text: "0 min"
+                                    font_size: "8sp"
+                                    theme_text_color: "Custom"
+                                    text_color: app.text_secondary
+
+                            # 7 Columnas de días
+                            BoxLayout:
+                                orientation: 'horizontal'
+                                spacing: dp(10)
+
+                                # Lun (20 min)
+                                BoxLayout:
+                                    orientation: 'vertical'
+                                    spacing: dp(4)
+                                    Widget:
+                                        size_hint_y: 0.67
+                                    Widget:
+                                        size_hint_y: 0.33
+                                        canvas:
+                                            Color:
+                                                rgba: app.color_progreso
+                                            RoundedRectangle:
+                                                pos: self.pos
+                                                size: self.size
+                                                radius: [dp(3), dp(3), 0, 0]
+                                    MDLabel:
+                                        text: "Lun"
+                                        font_size: "9sp"
+                                        halign: "center"
+                                        theme_text_color: "Custom"
+                                        text_color: app.text_secondary
+                                        size_hint_y: None
+                                        height: dp(14)
+
+                                # Mar (45 min)
+                                BoxLayout:
+                                    orientation: 'vertical'
+                                    spacing: dp(4)
+                                    Widget:
+                                        size_hint_y: 0.25
+                                    Widget:
+                                        size_hint_y: 0.75
+                                        canvas:
+                                            Color:
+                                                rgba: app.color_progreso
+                                            RoundedRectangle:
+                                                pos: self.pos
+                                                size: self.size
+                                                radius: [dp(3), dp(3), 0, 0]
+                                    MDLabel:
+                                        text: "Mar"
+                                        font_size: "9sp"
+                                        halign: "center"
+                                        theme_text_color: "Custom"
+                                        text_color: app.text_secondary
+                                        size_hint_y: None
+                                        height: dp(14)
+
+                                # Mié (30 min)
+                                BoxLayout:
+                                    orientation: 'vertical'
+                                    spacing: dp(4)
+                                    Widget:
+                                        size_hint_y: 0.5
+                                    Widget:
+                                        size_hint_y: 0.5
+                                        canvas:
+                                            Color:
+                                                rgba: app.color_progreso
+                                            RoundedRectangle:
+                                                pos: self.pos
+                                                size: self.size
+                                                radius: [dp(3), dp(3), 0, 0]
+                                    MDLabel:
+                                        text: "Mié"
+                                        font_size: "9sp"
+                                        halign: "center"
+                                        theme_text_color: "Custom"
+                                        text_color: app.text_secondary
+                                        size_hint_y: None
+                                        height: dp(14)
+
+                                # Jue (0 min)
+                                BoxLayout:
+                                    orientation: 'vertical'
+                                    spacing: dp(4)
+                                    Widget:
+                                        size_hint_y: 1.0
+                                    MDLabel:
+                                        text: "Jue"
+                                        font_size: "9sp"
+                                        halign: "center"
+                                        theme_text_color: "Custom"
+                                        text_color: app.text_secondary
+                                        size_hint_y: None
+                                        height: dp(14)
+
+                                # Vie (30 min)
+                                BoxLayout:
+                                    orientation: 'vertical'
+                                    spacing: dp(4)
+                                    Widget:
+                                        size_hint_y: 0.5
+                                    Widget:
+                                        size_hint_y: 0.5
+                                        canvas:
+                                            Color:
+                                                rgba: app.color_progreso
+                                            RoundedRectangle:
+                                                pos: self.pos
+                                                size: self.size
+                                                radius: [dp(3), dp(3), 0, 0]
+                                    MDLabel:
+                                        text: "Vie"
+                                        font_size: "9sp"
+                                        halign: "center"
+                                        theme_text_color: "Custom"
+                                        text_color: app.text_secondary
+                                        size_hint_y: None
+                                        height: dp(14)
+
+                                # Sáb (50 min)
+                                BoxLayout:
+                                    orientation: 'vertical'
+                                    spacing: dp(4)
+                                    Widget:
+                                        size_hint_y: 0.17
+                                    Widget:
+                                        size_hint_y: 0.83
+                                        canvas:
+                                            Color:
+                                                rgba: app.color_progreso
+                                            RoundedRectangle:
+                                                pos: self.pos
+                                                size: self.size
+                                                radius: [dp(3), dp(3), 0, 0]
+                                    MDLabel:
+                                        text: "Sáb"
+                                        font_size: "9sp"
+                                        halign: "center"
+                                        theme_text_color: "Custom"
+                                        text_color: app.text_secondary
+                                        size_hint_y: None
+                                        height: dp(14)
+
+                                # Dom (0 min)
+                                BoxLayout:
+                                    orientation: 'vertical'
+                                    spacing: dp(4)
+                                    Widget:
+                                        size_hint_y: 1.0
+                                    MDLabel:
+                                        text: "Dom"
+                                        font_size: "9sp"
+                                        halign: "center"
+                                        theme_text_color: "Custom"
+                                        text_color: app.text_secondary
+                                        size_hint_y: None
+                                        height: dp(14)
+
+                    # Tarjeta Derecha: Racha actual & Meta de hoy
+                    MDCard:
+                        size_hint_x: 0.36
+                        radius: [dp(14), dp(14), dp(14), dp(14)]
+                        padding: [dp(20), dp(16), dp(20), dp(16)]
+                        spacing: dp(14)
+                        orientation: 'vertical'
+                        md_bg_color: app.card_bg
+                        line_color: app.card_border
+                        line_width: 1
+                        elevation: 0
+
+                        # Fila Racha actual
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            spacing: dp(14)
+                            pos_hint: {'center_y': 0.5}
+
+                            MDIcon:
+                                icon: "fire"
+                                font_size: "24sp"
+                                theme_text_color: "Custom"
+                                text_color: app.color_acento
+                                size_hint_x: None
+                                width: dp(26)
+                                pos_hint: {'center_y': 0.5}
+
+                            BoxLayout:
+                                orientation: 'vertical'
+                                spacing: dp(2)
+                                pos_hint: {'center_y': 0.5}
+
+                                MDLabel:
+                                    text: "Racha actual"
+                                    font_size: "11sp"
+                                    theme_text_color: "Custom"
+                                    text_color: app.text_secondary
+
+                                MDLabel:
+                                    text: root.racha_actual_texto
+                                    font_style: "H6"
+                                    bold: True
+                                    theme_text_color: "Custom"
+                                    text_color: app.text_primary
+
+                        # Fila Meta de hoy
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            spacing: dp(14)
+                            pos_hint: {'center_y': 0.5}
+
+                            MDIcon:
+                                icon: "bullseye-arrow"
+                                font_size: "24sp"
+                                theme_text_color: "Custom"
+                                text_color: app.color_acento
+                                size_hint_x: None
+                                width: dp(26)
+                                pos_hint: {'center_y': 0.5}
+
+                            BoxLayout:
+                                orientation: 'vertical'
+                                spacing: dp(2)
+                                pos_hint: {'center_y': 0.5}
+
+                                MDLabel:
+                                    text: "Meta de hoy"
+                                    font_size: "11sp"
+                                    theme_text_color: "Custom"
+                                    text_color: app.text_secondary
+
+                                MDLabel:
+                                    text: root.meta_hoy_texto
+                                    font_style: "H6"
+                                    bold: True
+                                    theme_text_color: "Custom"
+                                    text_color: app.text_primary

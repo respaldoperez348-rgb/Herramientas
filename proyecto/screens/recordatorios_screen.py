@@ -4,8 +4,10 @@ from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDFlatButton, MDRaisedButton, MDFillRoundFlatButton
 from kivymd.uix.textfield import MDTextField
 from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.uix.label import MDLabel
 from kivymd.uix.selectioncontrol import MDSwitch
 from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.list import OneLineListItem
 from kivymd.uix.pickers import MDTimePicker
 from kivy.properties import StringProperty, BooleanProperty, NumericProperty
 from datetime import time
@@ -62,7 +64,7 @@ class FormularioNuevoRecordatorio(MDBoxLayout):
             {
                 "text": h['nombre'],
                 "viewclass": "OneLineListItem",
-                "on_release": lambda x=h: self.seleccionar_habito(x),
+                "on_release": lambda *args, hab=h: self.seleccionar_habito(hab),
             } for h in self.habitos
         ] if self.habitos else []
         self.menu_habitos = MDDropdownMenu(
@@ -118,7 +120,8 @@ class FormularioNuevoRecordatorio(MDBoxLayout):
 
         # 5. Switch Activo
         box_switch = MDBoxLayout(orientation='horizontal', size_hint_y=None, height="34dp", spacing="10dp")
-        self.switch_activo = MDSwitch(active=True, size_hint=(None, None), size=("40dp", "24dp"))
+        box_switch.add_widget(MDLabel(text="Activar recordatorio:", font_style="Caption", theme_text_color="Custom", text_color=(0.7, 0.75, 0.85, 1)))
+        self.switch_activo = MDSwitch(size_hint=(None, None), size=("40dp", "24dp"))
         box_switch.add_widget(self.switch_activo)
         self.add_widget(box_switch)
 
@@ -312,17 +315,22 @@ class RecordatoriosScreen(MDScreen):
             mensaje = self.form_recordatorio.campo_mensaje.text.strip()
             activo = self.form_recordatorio.switch_activo.active
 
+            color_btn = self.app.color_acento if self.app and hasattr(self.app, 'color_acento') else (0.88, 0.11, 0.28, 1)
+
             self.guardar_nuevo_recordatorio(id_hab, nom_hab, hora, dias_str, mensaje, activo)
             if self.dialog:
                 self.dialog.dismiss()
+
+        color_btn = self.app.color_acento if self.app and hasattr(self.app, 'color_acento') else (0.88, 0.11, 0.28, 1)
 
         self.dialog = MDDialog(
             title="Programar Horario de Hábito",
             type="custom",
             content_cls=self.form_recordatorio,
+            size_hint=(0.48, None),
             buttons=[
                 MDFlatButton(text="Cancelar", on_release=lambda x: self.dialog.dismiss()),
-                MDRaisedButton(text="Guardar Horario", md_bg_color=(0, 0.7, 0.9, 1), on_release=_guardar)
+                MDRaisedButton(text="Guardar Horario", md_bg_color=color_btn, on_release=_guardar)
             ]
         )
         self.dialog.open()
