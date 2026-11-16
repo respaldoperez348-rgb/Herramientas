@@ -9,7 +9,7 @@ class BaseDatos:
             host="localhost",
             database="habitos_bd",
             user="postgres",
-            password="master.1",
+            password="12345",
             port="5432",
         )
         self.cursor = self.conn.cursor(cursor_factory=RealDictCursor)
