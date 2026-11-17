@@ -44,7 +44,7 @@ class HabitTrackerApp(MDApp):
         if BaseDatos:
             try:
                 self.base_datos = BaseDatos()
-                print("Base de datos PostgreSQL conectada")
+                print(f"Base de datos activa en modo: {self.base_datos.modo.upper()}")
             except Exception as e:
                 print(f"Aviso: No se pudo conectar a PostgreSQL ({e}). Operando en modo demostración/local.")
                 self.base_datos = None
