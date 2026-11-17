@@ -13,20 +13,22 @@ except ImportError:
 
 
 class BaseDatos:
-    def __init__(self, ruta_sqlite=None):
-        os.environ.setdefault("PGCLIENTENCODING", "UTF8")
-        self.modo = "postgres"
-        self.conn = None
-        self.cursor = None
+    def __init__(self):
+        db_host = os.getenv("DB_HOST", "localhost")
+        db_name = os.getenv("DB_NAME", "habitos_bd")
+        db_user = os.getenv("DB_USER", "postgres")
+        db_password = os.getenv("DB_PASSWORD", "master.1")
+        db_port = os.getenv("DB_PORT", "5432")
 
-        if ruta_sqlite is None:
-            base_dir = os.path.dirname(os.path.abspath(__file__))
-            ruta_sqlite = os.path.join(base_dir, "habitpulse.db")
-        self.ruta_sqlite = ruta_sqlite
-
-        if not self._conectar_postgres():
-            self._conectar_sqlite()
-
+        self.conn = psycopg2.connect(
+            host="localhost",
+            database="habitos_bd",
+            user="postgres",
+            password="12345",
+            port="5432",
+        )
+        self.cursor = self.conn.cursor(cursor_factory=RealDictCursor)
+        print("Conectado a la base de datos")
         self.crear_tablas()
 
 
