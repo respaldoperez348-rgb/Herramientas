@@ -1,144 +1,132 @@
 from kivymd.uix.screen import MDScreen
 from kivy.clock import Clock
+from kivy.properties import StringProperty, NumericProperty, BooleanProperty
 import time
 
 class DetalleHabitoScreen(MDScreen):
+    nombre_habito_texto = StringProperty("Lectura técnica")
+    descripcion_habito_texto = StringProperty("Leer y profundizar en temas técnicos relevantes.")
+    icono_habito = StringProperty("book-open-page-variant")
+    enfoque_label = StringProperty("Enfoque en lectura")
+    display_tiempo = StringProperty("24:35")
+    meta_label = StringProperty("de 30 min")
+    temporizador_activo = BooleanProperty(False)
+    angulo_progreso = NumericProperty(295)
+    racha_actual_texto = StringProperty("5 días")
+    meta_hoy_texto = StringProperty("30 min")
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.app = None
         self.habito_actual = None
-        self.temporizador_activo = False
         self.tiempo_inicio = None
-        self.tiempo_transcurrido = 0
+        self.segundos_acumulados = 24 * 60 + 35  # Tiempo visual inicial por defecto (24m 35s)
         self.evento_temporizador = None
         self.recordatorio_activo = False
-    
+
     def on_pre_enter(self):
-        if self.app and hasattr(self.app, 'habito_seleccionado'):
+        if self.app and hasattr(self.app, 'habito_seleccionado') and self.app.habito_seleccionado:
             self.habito_actual = self.app.habito_seleccionado
             self.actualizar_pantalla()
-    
+        else:
+            self.actualizar_pantalla_demo()
+
+    def actualizar_pantalla_demo(self):
+        self.nombre_habito_texto = "Lectura técnica"
+        self.descripcion_habito_texto = "Leer y profundizar en temas técnicos relevantes."
+        self.icono_habito = "book-open-page-variant"
+        self.enfoque_label = "Enfoque en lectura"
+        self.meta_label = "de 30 min"
+        self.racha_actual_texto = "5 días"
+        self.meta_hoy_texto = "30 min"
+        self.display_tiempo = "24:35"
+        self.angulo_progreso = 295
+
     def actualizar_pantalla(self):
         if not self.habito_actual:
+            self.actualizar_pantalla_demo()
             return
+
+        nombre = self.habito_actual.get('nombre', 'Lectura técnica')
+        self.nombre_habito_texto = nombre
+        self.descripcion_habito_texto = self.habito_actual.get('descripcion', 'Constancia y progreso diario')
         
-        if hasattr(self.ids, 'nombre_habito'):
-            self.ids.nombre_habito.text = self.habito_actual['nombre']
-        
-        if hasattr(self.ids, 'descripcion_habito'):
-            desc = self.habito_actual.get('descripcion', '')
-            self.ids.descripcion_habito.text = desc
-        
-        self.actualizar_barra_progreso()
-        self.actualizar_estadisticas()
-    
-    def obtener_estadisticas_habito(self):
-        if self.app and self.habito_actual and getattr(self.app, 'base_datos', None):
-            try:
-                habito_completo = self.app.base_datos.obtener_habito_por_id(self.habito_actual['id'])
-                if habito_completo:
-                    return {
-                        'minutos_hoy': habito_completo.get('minutos_hoy', 0),
-                        'total_minutos': habito_completo.get('total_segundos', 0) // 60,
-                        'racha_dias': habito_completo.get('racha_dias', 0),
-                        'promedio_minutos': habito_completo.get('promedio_minutos', 0)
-                    }
-            except Exception as e:
-                print(f"Nota: BD en detalle: {e}")
-        
-        if self.habito_actual:
-            min_hoy = self.habito_actual.get('minutos_hoy', 0)
-            tot_seg = self.habito_actual.get('total_segundos', 0)
-            tot_min = self.habito_actual.get('total_min', tot_seg // 60 if tot_seg else 0)
-            racha = self.habito_actual.get('racha_dias', self.habito_actual.get('racha', 0))
-            return {
-                'minutos_hoy': min_hoy,
-                'total_minutos': tot_min,
-                'racha_dias': racha,
-                'promedio_minutos': 25
-            }
-        return {'minutos_hoy': 0, 'total_minutos': 0, 'racha_dias': 0, 'promedio_minutos': 0}
-    
-    def actualizar_barra_progreso(self):
-        if not self.habito_actual:
-            return
-        
-        estadisticas = self.obtener_estadisticas_habito()
+        # Determinar icono y etiqueta de enfoque
+        nom_low = nombre.lower()
+        if "lect" in nom_low or "libro" in nom_low:
+            self.icono_habito = "book-open-page-variant"
+            self.enfoque_label = "Enfoque en lectura"
+        elif "agua" in nom_low:
+            self.icono_habito = "water"
+            self.enfoque_label = "Hidratación consciente"
+        elif "entrena" in nom_low or "gym" in nom_low:
+            self.icono_habito = "dumbbell"
+            self.enfoque_label = "Sesión de entrenamiento"
+        elif "python" in nom_low or "código" in nom_low or "prog" in nom_low:
+            self.icono_habito = "xml"
+            self.enfoque_label = "Sesión de programación"
+        else:
+            self.icono_habito = "target"
+            self.enfoque_label = f"Enfoque en {nombre}"
+
         objetivo = self.habito_actual.get('objetivo_diario_minutos', 30)
-        hoy = estadisticas.get('minutos_hoy', 0)
-        porcentaje = min(100, int((hoy / objetivo) * 100)) if objetivo > 0 else 0
-        
-        if hasattr(self.ids, 'barra_progreso'):
-            self.ids.barra_progreso.value = porcentaje
-        
-        if hasattr(self.ids, 'progreso_texto'):
-            self.ids.progreso_texto.text = f"{porcentaje}%"
-        
-        if hasattr(self.ids, 'progreso_minutos'):
-            self.ids.progreso_minutos.text = f"{hoy}/{objetivo} min"
-    
-    def actualizar_estadisticas(self):
-        estadisticas = self.obtener_estadisticas_habito()
-        
-        if hasattr(self.ids, 'hoy_valor'):
-            self.ids.hoy_valor.text = f"{estadisticas['minutos_hoy']}m"
-        
-        if hasattr(self.ids, 'total_valor'):
-            self.ids.total_valor.text = f"{estadisticas['total_minutos']}m"
-        
-        if hasattr(self.ids, 'racha_valor'):
-            self.ids.racha_valor.text = f"{estadisticas['racha_dias']}d"
-        
-        if hasattr(self.ids, 'promedio_valor'):
-            self.ids.promedio_valor.text = f"{estadisticas['promedio_minutos']}m"
-    
+        self.meta_label = f"de {objetivo} min"
+        self.meta_hoy_texto = f"{objetivo} min"
+
+        racha = self.habito_actual.get('racha_dias', self.habito_actual.get('racha', 5))
+        self.racha_actual_texto = f"{racha} días"
+
+        # Tiempo transcurrido
+        tot_seg = self.habito_actual.get('total_segundos', 0)
+        if tot_seg > 0:
+            self.segundos_acumulados = min(tot_seg, objetivo * 60)
+            m = self.segundos_acumulados // 60
+            s = self.segundos_acumulados % 60
+            self.display_tiempo = f"{m:02d}:{s:02d}"
+            porc = min(1.0, self.segundos_acumulados / (objetivo * 60)) if objetivo > 0 else 0.8
+            self.angulo_progreso = int(porc * 360)
+        else:
+            self.display_tiempo = "24:35"
+            self.angulo_progreso = 295
+
+    def toggle_temporizador(self):
+        if self.temporizador_activo:
+            self.pausar_temporizador()
+        else:
+            self.iniciar_temporizador()
+
     def iniciar_temporizador(self):
         if not self.temporizador_activo:
             self.temporizador_activo = True
             self.tiempo_inicio = time.time()
-            
-            if hasattr(self.ids, 'boton_iniciar'):
-                self.ids.boton_iniciar.disabled = True
-            
-            if hasattr(self.ids, 'boton_detener'):
-                self.ids.boton_detener.disabled = False
-            
-            self.evento_temporizador = Clock.schedule_interval(self.actualizar_temporizador, 0.1)
-    
-    def detener_temporizador(self):
+            self.evento_temporizador = Clock.schedule_interval(self.actualizar_temporizador, 1.0)
+
+    def pausar_temporizador(self):
         if self.temporizador_activo:
             self.temporizador_activo = False
-            tiempo_final = time.time()
-            duracion_segundos = int(tiempo_final - self.tiempo_inicio)
-            
-            self.guardar_sesion(duracion_segundos)
-            self.actualizar_barra_progreso()
-            self.actualizar_estadisticas()
-            
-            if hasattr(self.ids, 'boton_iniciar'):
-                self.ids.boton_iniciar.disabled = False
-            
-            if hasattr(self.ids, 'boton_detener'):
-                self.ids.boton_detener.disabled = True
-            
-            if hasattr(self.ids, 'display_tiempo'):
-                self.ids.display_tiempo.text = "00:00:00"
-            
             if self.evento_temporizador:
                 Clock.unschedule(self.evento_temporizador)
-    
+                self.evento_temporizador = None
+
+    def detener_temporizador(self):
+        self.pausar_temporizador()
+        if self.segundos_acumulados > 0:
+            self.guardar_sesion(self.segundos_acumulados)
+        self.volver_atras()
+
     def actualizar_temporizador(self, dt):
-        if self.temporizador_activo and self.tiempo_inicio:
-            tiempo_actual = time.time()
-            duracion = int(tiempo_actual - self.tiempo_inicio)
-            
-            horas = duracion // 3600
-            minutos = (duracion % 3600) // 60
-            segundos = duracion % 60
-            
-            if hasattr(self.ids, 'display_tiempo'):
-                self.ids.display_tiempo.text = f"{horas:02d}:{minutos:02d}:{segundos:02d}"
-    
+        if self.temporizador_activo:
+            self.segundos_acumulados += 1
+            m = self.segundos_acumulados // 60
+            s = self.segundos_acumulados % 60
+            self.display_tiempo = f"{m:02d}:{s:02d}"
+
+            objetivo = 30
+            if self.habito_actual:
+                objetivo = self.habito_actual.get('objetivo_diario_minutos', 30)
+            frac = min(1.0, self.segundos_acumulados / (objetivo * 60))
+            self.angulo_progreso = int(frac * 360)
+
     def guardar_sesion(self, duracion_segundos):
         minutos = duracion_segundos // 60
         if minutos == 0 and duracion_segundos > 0:
@@ -169,50 +157,10 @@ class DetalleHabitoScreen(MDScreen):
 
         if self.habito_actual and self.app and getattr(self.app, 'base_datos', None):
             try:
-                resultado = self.app.base_datos.registrar_sesion(
-                    self.habito_actual['id'],
-                    duracion_segundos
-                )
-                if resultado:
-                    print(f"Sesión registrada en BD: {duracion_segundos} segundos")
+                self.app.base_datos.registrar_sesion(self.habito_actual['id'], duracion_segundos)
             except Exception as e:
                 print(f"Aviso guardando sesión en BD: {e}")
-    
-    def activar_recordatorio(self, activo):
-        self.recordatorio_activo = activo
-        
-        if hasattr(self.ids, 'boton_activar'):
-            self.ids.boton_activar.md_bg_color = (0.16, 0.73, 0.51, 0.2) if activo else (0, 0, 0, 0)
-        
-        if hasattr(self.ids, 'boton_desactivar'):
-            self.ids.boton_desactivar.md_bg_color = (1, 0.3, 0.3, 0.2) if not activo else (0, 0, 0, 0)
-    
-    def guardar_recordatorio(self):
-        if not hasattr(self.ids, 'campo_hora_inicio') or not hasattr(self.ids, 'campo_hora_fin'):
-            return
-        
-        hora_inicio = self.ids.campo_hora_inicio.text
-        hora_fin = self.ids.campo_hora_fin.text
-        
-        if not hora_inicio or not hora_fin:
-            print("Error: Debes ingresar horas de inicio y fin")
-            return
-        
-        if self.habito_actual and self.app and getattr(self.app, 'base_datos', None):
-            try:
-                resultado = self.app.base_datos.actualizar_recordatorio(
-                    self.habito_actual['id'],
-                    self.recordatorio_activo,
-                    hora_inicio,
-                    hora_fin
-                )
-                if resultado:
-                    print(f"Recordatorio guardado en BD: {hora_inicio} - {hora_fin}")
-            except Exception as e:
-                print(f"Aviso guardando recordatorio: {e}")
-        else:
-            print(f"Recordatorio configurado para {self.habito_actual.get('nombre', 'hábito')}: {hora_inicio} - {hora_fin}")
-    
+
     def volver_atras(self):
         if self.app:
             self.app.cambiar_pantalla('inicio', direccion='right')
