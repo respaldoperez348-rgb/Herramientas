@@ -19,7 +19,7 @@ jobs:
 
       - name: Instalar dependencias
         run: |
-          pip install -r requirements.txt pytest
+          pip install pytest bcrypt python-dotenv psycopg2-binary requests
 
       - name: Ejecutar tests
         run: pytest tests/ -v
