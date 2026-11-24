@@ -5,12 +5,14 @@
 <MetaCard>:
     orientation: 'vertical'
     size_hint_y: None
-    height: dp(160)
-    padding: dp(14)
+    height: dp(148)
+    padding: [dp(16), dp(12), dp(16), dp(12)]
     spacing: dp(8)
     radius: [dp(12), dp(12), dp(12), dp(12)]
-    md_bg_color: 0.12, 0.16, 0.23, 1
-    elevation: 3
+    md_bg_color: app.card_item_bg
+    line_color: app.card_border
+    line_width: 1
+    elevation: 0
 
     # Fila 1: Título y Badge de Estado
     BoxLayout:
@@ -24,19 +26,19 @@
             font_style: "Subtitle1"
             bold: True
             theme_text_color: "Custom"
-            text_color: 1, 1, 1, 1
-            size_hint_x: 0.65
+            text_color: app.text_primary
+            size_hint_x: 0.68
             shorten: True
             shorten_from: 'right'
 
         # Badge de estado dinámico
         MDCard:
             size_hint: None, None
-            size: dp(90), dp(24)
+            size: dp(96), dp(24)
             radius: [dp(12), dp(12), dp(12), dp(12)]
             md_bg_color: root.color_estado_fondo
             elevation: 0
-            
+
             MDLabel:
                 text: root.estado
                 font_style: "Caption"
@@ -50,408 +52,312 @@
     BoxLayout:
         orientation: 'horizontal'
         size_hint_y: None
-        height: dp(22)
+        height: dp(20)
         spacing: dp(10)
 
-        # Hábito asociado
         BoxLayout:
             orientation: 'horizontal'
             spacing: dp(4)
             size_hint_x: 0.55
 
-            MDIconButton:
+            MDIcon:
                 icon: "tag-outline"
+                font_size: "14sp"
                 theme_text_color: "Custom"
-                text_color: 0, 0.97, 1, 1
-                size_hint: None, None
-                size: dp(20), dp(20)
-                padding: dp(2)
+                text_color: app.color_acento
+                size_hint_x: None
+                width: dp(18)
+                pos_hint: {'center_y': 0.5}
 
             MDLabel:
                 text: root.nombre_habito
                 font_style: "Caption"
+                bold: True
                 theme_text_color: "Custom"
-                text_color: 0, 0.97, 1, 1
+                text_color: app.text_secondary
                 shorten: True
                 shorten_from: 'right'
+                pos_hint: {'center_y': 0.5}
 
-        # Fecha límite
         BoxLayout:
             orientation: 'horizontal'
             spacing: dp(4)
             size_hint_x: 0.45
 
-            MDIconButton:
+            MDIcon:
                 icon: "calendar-clock"
+                font_size: "14sp"
                 theme_text_color: "Custom"
-                text_color: 0.7, 0.75, 0.85, 1
-                size_hint: None, None
-                size: dp(20), dp(20)
-                padding: dp(2)
+                text_color: app.text_secondary
+                size_hint_x: None
+                width: dp(18)
+                pos_hint: {'center_y': 0.5}
 
             MDLabel:
                 text: f"Límite: {root.fecha_limite}"
                 font_style: "Caption"
                 theme_text_color: "Custom"
-                text_color: 0.7, 0.75, 0.85, 1
+                text_color: app.text_secondary
                 shorten: True
                 shorten_from: 'right'
+                pos_hint: {'center_y': 0.5}
 
-    # Fila 3: Porcentaje y Barra de Progreso (MDProgressBar)
+    # Fila 3: Porcentaje y Barra de Progreso
     BoxLayout:
         orientation: 'vertical'
         size_hint_y: None
-        height: dp(34)
+        height: dp(32)
         spacing: dp(4)
 
         BoxLayout:
             orientation: 'horizontal'
             size_hint_y: None
-            height: dp(18)
+            height: dp(16)
 
             MDLabel:
                 text: "Progreso alcanzado:"
-                font_style: "Caption"
+                font_size: "11sp"
                 theme_text_color: "Custom"
-                text_color: 0.65, 0.7, 0.8, 1
-                size_hint_x: 0.65
+                text_color: app.text_secondary
+                size_hint_x: 0.7
 
             MDLabel:
                 text: f"{int(root.progreso_porcentaje)}%"
-                font_style: "Subtitle2"
+                font_size: "12sp"
                 bold: True
                 halign: "right"
                 theme_text_color: "Custom"
-                text_color: root.color_porcentaje
-                size_hint_x: 0.35
+                text_color: app.text_primary
+                size_hint_x: 0.3
 
-        MDProgressBar:
-            id: progress_bar
-            max: 100
-            value: root.progreso_porcentaje
-            color: root.color_porcentaje
+        # Barra de progreso estilizada
+        Widget:
             size_hint_y: None
-            height: dp(8)
+            height: dp(6)
+            canvas:
+                Color:
+                    rgba: app.track_bg
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [dp(3), dp(3), dp(3), dp(3)]
+                Color:
+                    rgba: app.color_progreso if root.progreso_porcentaje > 0 else (0, 0, 0, 0)
+                RoundedRectangle:
+                    pos: self.pos
+                    size: (self.width * (min(100.0, float(root.progreso_porcentaje)) / 100.0), self.height)
+                    radius: [dp(3), dp(3), dp(3), dp(3)]
 
     # Fila 4: Acciones rápidas (Incremento, Completar, Eliminar)
     BoxLayout:
         orientation: 'horizontal'
         size_hint_y: None
-        height: dp(32)
+        height: dp(28)
         spacing: dp(6)
 
         MDFillRoundFlatButton:
             text: "+10%"
-            font_size: "11sp"
-            size_hint_x: 0.22
-            size_hint_y: None
-            height: dp(28)
-            md_bg_color: 0.18, 0.23, 0.32, 1
-            text_color: 0, 0.97, 1, 1
+            font_size: "10sp"
+            size_hint: None, None
+            size: dp(60), dp(24)
+            md_bg_color: (app.color_acento[0], app.color_acento[1], app.color_acento[2], 0.16)
+            text_color: app.color_acento
             on_release: root.sumar_progreso(10)
 
         MDFillRoundFlatButton:
             text: "+25%"
-            font_size: "11sp"
-            size_hint_x: 0.22
-            size_hint_y: None
-            height: dp(28)
-            md_bg_color: 0.18, 0.23, 0.32, 1
-            text_color: 0, 0.97, 1, 1
+            font_size: "10sp"
+            size_hint: None, None
+            size: dp(60), dp(24)
+            md_bg_color: (app.color_acento[0], app.color_acento[1], app.color_acento[2], 0.16)
+            text_color: app.color_acento
             on_release: root.sumar_progreso(25)
 
-        MDFillRoundFlatButton:
-            text: "✓ Completar"
-            font_size: "11sp"
-            size_hint_x: 0.38
-            size_hint_y: None
-            height: dp(28)
-            md_bg_color: 0.16, 0.73, 0.51, 0.3
-            text_color: 0.2, 0.9, 0.6, 1
+        Widget:
+
+        MDIconButton:
+            icon: "check-circle-outline"
+            user_font_size: "18sp"
+            theme_text_color: "Custom"
+            text_color: app.color_progreso
+            size_hint: None, None
+            size: dp(26), dp(26)
             on_release: root.completar_meta()
 
         MDIconButton:
             icon: "trash-can-outline"
+            user_font_size: "18sp"
             theme_text_color: "Custom"
-            text_color: 0.9, 0.3, 0.3, 1
+            text_color: 0.9, 0.35, 0.35, 1
             size_hint: None, None
-            size: dp(28), dp(28)
-            padding: dp(4)
+            size: dp(26), dp(26)
             on_release: root.eliminar_meta()
 
-
 <MetasScreen>:
-    FloatLayout:
-        canvas.before:
-            Color:
-                rgba: 0.07, 0.09, 0.13, 1
-            Rectangle:
-                pos: self.pos
-                size: self.size
+    md_bg_color: app.bg_app
 
-        # Header Superior
-        BoxLayout:
-            orientation: 'vertical'
-            size_hint: 0.92, None
-            height: dp(75)
-            pos_hint: {'center_x': 0.5, 'top': 0.98}
-            spacing: dp(2)
+    BoxLayout:
+        orientation: 'horizontal'
 
-            BoxLayout:
-                orientation: 'horizontal'
-                size_hint_y: None
-                height: dp(36)
+        # Sidebar de Navegación Fijo (Izquierda)
+        SidebarNav:
+            active_item: "metas"
 
-                MDLabel:
-                    text: "Metas de Hábitos"
-                    font_style: "H6"
-                    bold: True
-                    theme_text_color: "Custom"
-                    text_color: 0, 0.97, 1, 1
-                    halign: "left"
-                    size_hint_x: 0.7
-
-                MDFillRoundFlatButton:
-                    text: "+ Nueva"
-                    font_size: "12sp"
-                    size_hint: None, None
-                    size: dp(90), dp(32)
-                    md_bg_color: 0.1, 0.55, 0.9, 1
-                    text_color: 1, 1, 1, 1
-                    pos_hint: {'center_y': 0.5}
-                    on_release: root.mostrar_dialogo_nueva_meta()
-
-            MDLabel:
-                text: "Seguimiento por porcentaje de avance y fechas"
-                font_style: "Caption"
-                theme_text_color: "Custom"
-                text_color: 0.65, 0.7, 0.8, 1
-                size_hint_y: None
-                height: dp(18)
-
-        # Tarjeta Resumen de Métricas
-        MDCard:
-            orientation: 'horizontal'
-            size_hint: 0.92, None
-            height: dp(65)
-            pos_hint: {'center_x': 0.5, 'top': 0.86}
-            padding: [dp(12), dp(8)]
-            spacing: dp(8)
-            radius: [dp(12), dp(12), dp(12), dp(12)]
-            md_bg_color: 0.12, 0.16, 0.23, 1
-            elevation: 2
-
-            # Métrica 1: En Progreso
-            BoxLayout:
-                orientation: 'vertical'
-                halign: "center"
-                MDLabel:
-                    id: count_en_progreso
-                    text: "0"
-                    font_style: "H6"
-                    bold: True
-                    halign: "center"
-                    theme_text_color: "Custom"
-                    text_color: 0, 0.97, 1, 1
-                MDLabel:
-                    text: "En Progreso"
-                    font_style: "Caption"
-                    halign: "center"
-                    theme_text_color: "Custom"
-                    text_color: 0.6, 0.65, 0.75, 1
-
-            # Separador vertical
-            Widget:
-                size_hint: None, 0.7
-                width: dp(1)
-                pos_hint: {'center_y': 0.5}
-                canvas:
-                    Color:
-                        rgba: 0.25, 0.3, 0.4, 0.6
-                    Rectangle:
-                        pos: self.pos
-                        size: self.size
-
-            # Métrica 2: Completadas
-            BoxLayout:
-                orientation: 'vertical'
-                halign: "center"
-                MDLabel:
-                    id: count_completadas
-                    text: "0"
-                    font_style: "H6"
-                    bold: True
-                    halign: "center"
-                    theme_text_color: "Custom"
-                    text_color: 0.16, 0.85, 0.55, 1
-                MDLabel:
-                    text: "Completadas"
-                    font_style: "Caption"
-                    halign: "center"
-                    theme_text_color: "Custom"
-                    text_color: 0.6, 0.65, 0.75, 1
-
-            # Separador vertical
-            Widget:
-                size_hint: None, 0.7
-                width: dp(1)
-                pos_hint: {'center_y': 0.5}
-                canvas:
-                    Color:
-                        rgba: 0.25, 0.3, 0.4, 0.6
-                    Rectangle:
-                        pos: self.pos
-                        size: self.size
-
-            # Métrica 3: % Promedio
-            BoxLayout:
-                orientation: 'vertical'
-                halign: "center"
-                MDLabel:
-                    id: avg_porcentaje
-                    text: "0%"
-                    font_style: "H6"
-                    bold: True
-                    halign: "center"
-                    theme_text_color: "Custom"
-                    text_color: 1, 0.75, 0.2, 1
-                MDLabel:
-                    text: "Promedio"
-                    font_style: "Caption"
-                    halign: "center"
-                    theme_text_color: "Custom"
-                    text_color: 0.6, 0.65, 0.75, 1
-
-        # Filtros rápidos (Todas, En progreso, Completadas)
-        BoxLayout:
-            orientation: 'horizontal'
-            size_hint: 0.92, None
-            height: dp(34)
-            pos_hint: {'center_x': 0.5, 'top': 0.76}
-            spacing: dp(8)
-
-            MDFillRoundFlatButton:
-                id: btn_filtro_todas
-                text: "Todas"
-                font_size: "11sp"
-                size_hint_x: 0.33
-                md_bg_color: (0, 0.7, 0.9, 0.9) if root.filtro_actual == "Todas" else (0.15, 0.19, 0.27, 1)
-                text_color: (1, 1, 1, 1) if root.filtro_actual == "Todas" else (0.7, 0.75, 0.85, 1)
-                on_release: root.aplicar_filtro("Todas")
-
-            MDFillRoundFlatButton:
-                id: btn_filtro_progreso
-                text: "En Progreso"
-                font_size: "11sp"
-                size_hint_x: 0.34
-                md_bg_color: (0, 0.7, 0.9, 0.9) if root.filtro_actual == "En progreso" else (0.15, 0.19, 0.27, 1)
-                text_color: (1, 1, 1, 1) if root.filtro_actual == "En progreso" else (0.7, 0.75, 0.85, 1)
-                on_release: root.aplicar_filtro("En progreso")
-
-            MDFillRoundFlatButton:
-                id: btn_filtro_completadas
-                text: "Completadas"
-                font_size: "11sp"
-                size_hint_x: 0.33
-                md_bg_color: (0, 0.7, 0.9, 0.9) if root.filtro_actual == "Completado" else (0.15, 0.19, 0.27, 1)
-                text_color: (1, 1, 1, 1) if root.filtro_actual == "Completado" else (0.7, 0.75, 0.85, 1)
-                on_release: root.aplicar_filtro("Completado")
-
-        # Lista de Metas (ScrollView)
+        # Contenido Principal: Metas
         ScrollView:
-            size_hint: 0.92, 0.60
-            pos_hint: {'center_x': 0.5, 'y': 0.09}
             effect_cls: ScrollEffect
+            do_scroll_x: False
 
-            GridLayout:
-                id: metas_container
-                cols: 1
+            BoxLayout:
+                orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
-                spacing: dp(12)
-                padding: [0, dp(4), 0, dp(20)]
+                padding: [dp(32), dp(24), dp(36), dp(32)]
+                spacing: dp(18)
 
-        # Barra de Navegación Inferior Móvil
-        MDCard:
-            size_hint: 1, None
-            height: dp(56)
-            pos_hint: {'bottom': 1, 'center_x': 0.5}
-            md_bg_color: 0.10, 0.13, 0.18, 1
-            elevation: 8
-            radius: [dp(14), dp(14), 0, 0]
-            padding: [dp(4), dp(2)]
-
-            BoxLayout:
-                orientation: 'horizontal'
-
-                # Tab 1: Inicio
+                # Header Superior
                 BoxLayout:
-                    orientation: 'vertical'
-                    size_hint_x: 0.25
-                    spacing: 0
-                    MDIconButton:
-                        icon: "view-dashboard"
-                        theme_text_color: "Custom"
-                        text_color: 0.5, 0.55, 0.65, 1
-                        pos_hint: {'center_x': 0.5}
-                        on_release: root.app.cambiar_pantalla('inicio', 'right')
-                    MDLabel:
-                        text: "Hábitos"
-                        font_size: "9sp"
-                        halign: "center"
-                        theme_text_color: "Custom"
-                        text_color: 0.5, 0.55, 0.65, 1
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: dp(52)
 
-                # Tab 2: Metas (Activo)
-                BoxLayout:
-                    orientation: 'vertical'
-                    size_hint_x: 0.25
-                    spacing: 0
-                    MDIconButton:
-                        icon: "target"
-                        theme_text_color: "Custom"
-                        text_color: 0, 0.97, 1, 1
-                        pos_hint: {'center_x': 0.5}
-                    MDLabel:
-                        text: "Metas"
-                        font_size: "9sp"
+                    BoxLayout:
+                        orientation: 'vertical'
+                        spacing: dp(2)
+                        pos_hint: {'center_y': 0.5}
+
+                        MDLabel:
+                            text: "Metas de Hábitos"
+                            font_style: "H4"
+                            bold: True
+                            theme_text_color: "Custom"
+                            text_color: app.text_primary
+
+                        MDLabel:
+                            text: "Seguimiento por porcentaje de avance y fechas límite"
+                            font_style: "Subtitle2"
+                            theme_text_color: "Custom"
+                            text_color: app.text_secondary
+
+                    MDFillRoundFlatButton:
+                        text: "+ Nueva Meta"
+                        md_bg_color: app.color_acento
+                        text_color: 1, 1, 1, 1
+                        font_style: "Button"
                         bold: True
-                        halign: "center"
-                        theme_text_color: "Custom"
-                        text_color: 0, 0.97, 1, 1
+                        pos_hint: {'center_y': 0.5}
+                        on_release: root.mostrar_dialogo_nueva_meta()
 
-                # Tab 3: Recordatorios
-                BoxLayout:
-                    orientation: 'vertical'
-                    size_hint_x: 0.25
-                    spacing: 0
-                    MDIconButton:
-                        icon: "bell-ring"
-                        theme_text_color: "Custom"
-                        text_color: 0.5, 0.55, 0.65, 1
-                        pos_hint: {'center_x': 0.5}
-                        on_release: root.app.cambiar_pantalla('recordatorios', 'left')
-                    MDLabel:
-                        text: "Horarios"
-                        font_size: "9sp"
-                        halign: "center"
-                        theme_text_color: "Custom"
-                        text_color: 0.5, 0.55, 0.65, 1
+                # Tarjeta Resumen de Métricas (3 Columnas)
+                MDCard:
+                    size_hint_y: None
+                    height: dp(80)
+                    radius: [dp(14), dp(14), dp(14), dp(14)]
+                    padding: [dp(20), dp(12), dp(20), dp(12)]
+                    md_bg_color: app.card_bg
+                    line_color: app.card_border
+                    line_width: 1
+                    elevation: 0
 
-                # Tab 4: Asistente
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        spacing: dp(16)
+
+                        # Métrica 1: En Progreso
+                        BoxLayout:
+                            orientation: 'vertical'
+                            halign: "center"
+                            pos_hint: {'center_y': 0.5}
+                            MDLabel:
+                                id: count_en_progreso
+                                text: "0"
+                                font_style: "H5"
+                                bold: True
+                                halign: "center"
+                                theme_text_color: "Custom"
+                                text_color: app.color_acento
+                            MDLabel:
+                                text: "En Progreso"
+                                font_size: "11sp"
+                                halign: "center"
+                                theme_text_color: "Custom"
+                                text_color: app.text_secondary
+
+                        # Métrica 2: Completadas
+                        BoxLayout:
+                            orientation: 'vertical'
+                            halign: "center"
+                            pos_hint: {'center_y': 0.5}
+                            MDLabel:
+                                id: count_completadas
+                                text: "0"
+                                font_style: "H5"
+                                bold: True
+                                halign: "center"
+                                theme_text_color: "Custom"
+                                text_color: app.color_progreso
+                            MDLabel:
+                                text: "Completadas"
+                                font_size: "11sp"
+                                halign: "center"
+                                theme_text_color: "Custom"
+                                text_color: app.text_secondary
+
+                        # Métrica 3: % Promedio
+                        BoxLayout:
+                            orientation: 'vertical'
+                            halign: "center"
+                            pos_hint: {'center_y': 0.5}
+                            MDLabel:
+                                id: avg_porcentaje
+                                text: "0%"
+                                font_style: "H5"
+                                bold: True
+                                halign: "center"
+                                theme_text_color: "Custom"
+                                text_color: app.text_primary
+                            MDLabel:
+                                text: "Promedio Global"
+                                font_size: "11sp"
+                                halign: "center"
+                                theme_text_color: "Custom"
+                                text_color: app.text_secondary
+
+                # Filtros rápidos (Todas, En progreso, Completadas)
                 BoxLayout:
-                    orientation: 'vertical'
-                    size_hint_x: 0.25
-                    spacing: 0
-                    MDIconButton:
-                        icon: "robot"
-                        theme_text_color: "Custom"
-                        text_color: 0.5, 0.55, 0.65, 1
-                        pos_hint: {'center_x': 0.5}
-                        on_release: root.app.cambiar_pantalla('asistente', 'left')
-                    MDLabel:
-                        text: "Asistente"
-                        font_size: "9sp"
-                        halign: "center"
-                        theme_text_color: "Custom"
-                        text_color: 0.5, 0.55, 0.65, 1
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: dp(36)
+                    spacing: dp(10)
+
+                    MDFillRoundFlatButton:
+                        id: btn_filtro_todas
+                        text: "Todas"
+                        font_size: "11sp"
+                        md_bg_color: app.color_acento if root.filtro_actual == "Todas" else (0.12, 0.16, 0.23, 1)
+                        text_color: (1, 1, 1, 1) if root.filtro_actual == "Todas" else app.text_secondary
+                        on_release: root.aplicar_filtro("Todas")
+
+                    MDFillRoundFlatButton:
+                        id: btn_filtro_progreso
+                        text: "En Progreso"
+                        font_size: "11sp"
+                        md_bg_color: app.color_acento if root.filtro_actual == "En progreso" else (0.12, 0.16, 0.23, 1)
+                        text_color: (1, 1, 1, 1) if root.filtro_actual == "En progreso" else app.text_secondary
+                        on_release: root.aplicar_filtro("En progreso")
+
+                    MDFillRoundFlatButton:
+                        id: btn_filtro_completadas
+                        text: "Completadas"
+                        font_size: "11sp"
+                        md_bg_color: app.color_acento if root.filtro_actual == "Completado" else (0.12, 0.16, 0.23, 1)
+                        text_color: (1, 1, 1, 1) if root.filtro_actual == "Completado" else app.text_secondary
+                        on_release: root.aplicar_filtro("Completado")
+
+                # Contenedor de Tarjetas de Metas
+                GridLayout:
+                    id: metas_container
+                    cols: 1
+                    size_hint_y: None
+                    height: self.minimum_height
+                    spacing: dp(10)

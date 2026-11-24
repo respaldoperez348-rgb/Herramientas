@@ -981,6 +981,53 @@ class BaseDatos:
             return []
 
 
+    # =================== REPORTES (exportar_reporte.py) ===================
+    def obtener_datos_reporte(self, usuario_id):
+        """Datos del reporte de hábitos, compatibles con PostgreSQL y SQLite."""
+        try:
+            # Reutilizamos el método ya usado por la app: evita depender de si
+            # la columna se llama 'completada' (proyecto) o 'completado' (V2).
+            habitos_bd = self.obtener_habitos_usuario(usuario_id) or []
+            habitos = []
+            for habito in habitos_bd:
+                habitos.append({
+                    "id_habito": habito.get("id"),
+                    "nombre": habito.get("nombre") or "Sin nombre",
+                    "categoria": habito.get("categoria") or "Sin categoría",
+                    "objetivo_minutos": int(habito.get("objetivo_diario_minutos") or 0),
+                    "sesiones_completadas": int(habito.get("total_sesiones") or 0),
+                    "total_segundos": int(habito.get("total_segundos") or 0),
+                    "racha_dias": int(habito.get("racha_dias") or 0),
+                })
+
+            self.cursor.execute(
+                self._q("SELECT nombre_usuario, email FROM usuarios WHERE id = %s"),
+                (usuario_id,),
+            )
+            fila_usuario = self._one() or {}
+            usuario = {
+                "nombre_usuario": fila_usuario.get("nombre_usuario") or "Usuario",
+                "email": fila_usuario.get("email") or "",
+            }
+
+            return {
+                "modo": self.modo,
+                "fuente": "bd",
+                "usuario": usuario,
+                "habitos": habitos,
+                "metas": self.obtener_metas_usuario(usuario_id),
+            }
+
+        except Exception as e:
+            print(f"Error obteniendo datos del reporte: {e}")
+            return {
+                "modo": self.modo,
+                "fuente": "bd",
+                "usuario": {"nombre_usuario": "Usuario", "email": ""},
+                "habitos": [],
+                "metas": [],
+            }
+
 
     def cerrar_conexion(self):
         if self.cursor:

@@ -20,20 +20,22 @@ from screens.asistente_screen import AsistenteScreen
 from screens.detalle_habito_screen import DetalleHabitoScreen
 from screens.perfil_screen import PerfilScreen
 
-Window.size = (380, 760)
-Window.resizable = False
+Window.size = (1080, 680)
+Window.resizable = True
 
 class HabitTrackerApp(MDApp):
-    # Propiedades dinámicas reactivas para todo el sistema de interfaz
-    bg_app = ColorProperty([0.03, 0.04, 0.07, 1])
-    card_bg = ColorProperty([0.07, 0.09, 0.13, 0.95])
-    card_item_bg = ColorProperty([0.08, 0.10, 0.15, 0.85])
-    card_border = ColorProperty([1, 1, 1, 0.08])
-    text_primary = ColorProperty([0.98, 0.98, 1.0, 1])
-    text_secondary = ColorProperty([0.55, 0.60, 0.70, 1])
-    nav_bg = ColorProperty([0.06, 0.08, 0.12, 0.95])
-    color_acento = ColorProperty([0.88, 0.11, 0.28, 1])
-    tema_nombre = StringProperty("Crimson")
+    # Propiedades dinámicas reactivas para todo el sistema de interfaz (Tokens calibrados)
+    bg_app = ColorProperty([0.043, 0.059, 0.090, 1])        # #0B0F17 Slate oscuro
+    card_bg = ColorProperty([0.075, 0.098, 0.141, 0.98])    # #131924 Tarjeta
+    card_item_bg = ColorProperty([0.094, 0.122, 0.173, 0.95])# #181F2C Sub-tarjeta
+    card_border = ColorProperty([0.133, 0.169, 0.235, 1])   # #222B3C Borde sutil
+    text_primary = ColorProperty([0.96, 0.97, 0.99, 1])     # #F8FAFC Texto principal
+    text_secondary = ColorProperty([0.55, 0.60, 0.70, 1])   # #8C99B3 Texto secundario
+    nav_bg = ColorProperty([0.035, 0.051, 0.078, 1])        # #090D14
+    color_acento = ColorProperty([0.88, 0.24, 0.36, 1])     # #E03D5C Coral sobrio (no neón)
+    color_progreso = ColorProperty([0.06, 0.76, 0.52, 1])   # #10B981 Esmeralda / Menta
+    track_bg = ColorProperty([0.12, 0.15, 0.22, 1])         # Fondo de tracks y anillos
+    tema_nombre = StringProperty("Coral")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -99,6 +101,7 @@ class HabitTrackerApp(MDApp):
     
     def cargar_archivos_kv(self):
         archivos_kv = [
+            'sidebar_nav.kv',
             'login_screen.kv',
             'registro_screen.kv',
             'inicio_screen.kv',
@@ -150,21 +153,25 @@ class HabitTrackerApp(MDApp):
     def aplicar_modo_tema(self, modo="Dark"):
         self.theme_cls.theme_style = modo
         if modo == "Light":
-            self.bg_app = [0.95, 0.96, 0.98, 1]
-            self.card_bg = [1.0, 1.0, 1.0, 0.98]
-            self.card_item_bg = [0.91, 0.93, 0.96, 0.95]
-            self.card_border = [0, 0, 0, 0.09]
-            self.text_primary = [0.08, 0.10, 0.15, 1]
-            self.text_secondary = [0.42, 0.48, 0.58, 1]
-            self.nav_bg = [1.0, 1.0, 1.0, 0.98]
+            self.bg_app = [0.97, 0.98, 0.99, 1]          # #F8FAFC Blanco slate limpio
+            self.card_bg = [1.0, 1.0, 1.0, 1.0]           # #FFFFFF Tarjeta nítida
+            self.card_item_bg = [0.95, 0.96, 0.98, 1.0]  # #F1F5F9 Elemento interno
+            self.card_border = [0.88, 0.90, 0.94, 1.0]   # #E2E8F0 Borde con contraste
+            self.text_primary = [0.06, 0.09, 0.16, 1.0]  # #0F172A Texto oscuro nítido
+            self.text_secondary = [0.40, 0.46, 0.56, 1.0]# #64748B Texto secundario legible
+            self.nav_bg = [1.0, 1.0, 1.0, 1.0]
+            self.track_bg = [0.88, 0.90, 0.94, 1.0]      # Fondo claro para progreso
+            self.color_progreso = [0.02, 0.62, 0.44, 1.0]# #059669 Verde esmeralda con contraste
         else:
-            self.bg_app = [0.03, 0.04, 0.07, 1]
-            self.card_bg = [0.07, 0.09, 0.13, 0.95]
-            self.card_item_bg = [0.08, 0.10, 0.15, 0.85]
-            self.card_border = [1, 1, 1, 0.08]
-            self.text_primary = [0.98, 0.98, 1.0, 1]
+            self.bg_app = [0.043, 0.059, 0.090, 1]
+            self.card_bg = [0.075, 0.098, 0.141, 0.98]
+            self.card_item_bg = [0.094, 0.122, 0.173, 0.95]
+            self.card_border = [0.133, 0.169, 0.235, 1]
+            self.text_primary = [0.96, 0.97, 0.99, 1]
             self.text_secondary = [0.55, 0.60, 0.70, 1]
-            self.nav_bg = [0.06, 0.08, 0.12, 0.95]
+            self.nav_bg = [0.035, 0.051, 0.078, 1]
+            self.track_bg = [0.12, 0.15, 0.22, 1]
+            self.color_progreso = [0.06, 0.76, 0.52, 1]
 
     def cambiar_acento(self, nombre_tema, palette_name, color_rgba):
         self.tema_nombre = nombre_tema

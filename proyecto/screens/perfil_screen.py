@@ -107,15 +107,15 @@ class PerfilScreen(MDScreen):
             orientation='vertical',
             spacing=dp(8),
             size_hint_y=None,
-            height=dp(280),
-            padding=[dp(4), dp(4), dp(4), dp(4)]
+            height=dp(270),
+            padding=[dp(6), dp(6), dp(6), dp(6)]
         )
 
         grid = MDGridLayout(
-            cols=3,
-            spacing=dp(10),
+            cols=4,
+            spacing=dp(8),
             size_hint_y=None,
-            padding=dp(4)
+            padding=dp(2)
         )
         grid.bind(minimum_height=grid.setter('height'))
 
@@ -131,7 +131,7 @@ class PerfilScreen(MDScreen):
                 es_activo=es_act,
                 on_select_callback=self.seleccionar_avatar,
                 size_hint=(None, None),
-                size=(dp(70), dp(70))
+                size=(dp(78), dp(74))
             )
             grid.add_widget(card)
 
@@ -145,7 +145,8 @@ class PerfilScreen(MDScreen):
                     on_release=lambda x: self.dialog.dismiss()
                 )
             ],
-            size_hint=(0.90, None)
+            size_hint=(None, None),
+            width=dp(400)
         )
         self.dialog.open()
 
@@ -344,13 +345,12 @@ class PerfilScreen(MDScreen):
         if not self.app:
             return
         colores = {
-            "Crimson": (0.88, 0.11, 0.28, 1),
-            "Índigo": (0.45, 0.40, 0.95, 1),
-            "Cyan": (0.05, 0.75, 0.88, 1),
-            "Esmeralda": (0.10, 0.75, 0.50, 1),
-            "Slate": (0.50, 0.55, 0.65, 1)
+            "Coral": (0.88, 0.24, 0.36, 1),
+            "Ámbar": (0.85, 0.47, 0.02, 1),
+            "Esmeralda": (0.06, 0.72, 0.50, 1),
+            "Índigo": (0.31, 0.27, 0.90, 1)
         }
-        color_rgba = colores.get(nombre_tema, (0.88, 0.11, 0.28, 1))
+        color_rgba = colores.get(nombre_tema, (0.88, 0.24, 0.36, 1))
         self.app.cambiar_acento(nombre_tema, palette_name, color_rgba)
         self.tema_actual_nombre = nombre_tema
 

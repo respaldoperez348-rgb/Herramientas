@@ -6,6 +6,7 @@ from kivymd.uix.dialog import MDDialog
 from kivymd.uix.textfield import MDTextField
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivy.uix.screenmanager import SlideTransition
+from kivy.clock import Clock
 from kivy.properties import StringProperty, NumericProperty, BooleanProperty, ListProperty
 from datetime import datetime
 
@@ -19,6 +20,17 @@ except ImportError:
         import os
         sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         from gamificacion import SistemaGamificacion
+
+try:
+    from exportar_reporte import exportar_reporte as generar_reporte_excel
+except ImportError:
+    try:
+        from proyecto.exportar_reporte import exportar_reporte as generar_reporte_excel
+    except ImportError:
+        import sys
+        import os
+        sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from exportar_reporte import exportar_reporte as generar_reporte_excel
 
 class InsigniaCardItem(MDCard):
     titulo = StringProperty("")
@@ -37,13 +49,17 @@ class HabitCard(MDCard):
     habit_id = None
     nombre = StringProperty("")
     descripcion = StringProperty("")
+    progreso_texto = StringProperty("0 / 30 min")
+    progreso_porcentaje = NumericProperty(0)
+    porcentaje_label = StringProperty("0%")
+    icono = StringProperty("check-circle-outline")
+    categoria = StringProperty("Salud")
+    completado_hoy = BooleanProperty(False)
     sesiones = NumericProperty(0)
     racha = NumericProperty(0)
     total_min = NumericProperty(0)
     objetivo = NumericProperty(30)
-    categoria = StringProperty("Salud")
     horario = StringProperty("07:00 PM")
-    completado_hoy = BooleanProperty(False)
 
     def __init__(self, **kwargs):
         self.habit_id = kwargs.pop('habit_id', None)
@@ -59,6 +75,9 @@ class HabitCard(MDCard):
         cat_val = kwargs.pop('categoria', "Salud")
         horario_val = kwargs.pop('horario', "07:00 PM")
         completado_val = kwargs.pop('completado_hoy', False)
+        icono_val = kwargs.pop('icono', "")
+        prog_txt_val = kwargs.pop('progreso_texto', "")
+        porc_val = kwargs.pop('progreso_porcentaje', 0)
 
         super().__init__(**kwargs)
 
@@ -72,16 +91,65 @@ class HabitCard(MDCard):
         self.horario = horario_val
         self.completado_hoy = completado_val
 
+        # Icono según categoría o personalizado
+        if icono_val:
+            self.icono = icono_val
+        else:
+            cat_lower = cat_val.lower()
+            if "agua" in nombre_val.lower() or "hidra" in cat_lower:
+                self.icono = "water"
+            elif "lect" in nombre_val.lower() or "estudio" in cat_lower:
+                self.icono = "book-open-page-variant"
+            elif "entrena" in nombre_val.lower() or "gym" in nombre_val.lower() or "deporte" in cat_lower:
+                self.icono = "dumbbell"
+            elif "python" in nombre_val.lower() or "código" in nombre_val.lower() or "prog" in cat_lower:
+                self.icono = "xml"
+            else:
+                self.icono = "check-circle-outline"
+
+        # Progreso texto y porcentaje
+        if prog_txt_val:
+            self.progreso_texto = prog_txt_val
+            self.progreso_porcentaje = porc_val
+            self.porcentaje_label = f"{int(porc_val)}%"
+        else:
+            if self.completado_hoy:
+                self.progreso_porcentaje = 100
+                self.porcentaje_label = "100%"
+                if "agua" in self.nombre.lower():
+                    self.progreso_texto = "8 / 8 vasos"
+                else:
+                    self.progreso_texto = f"{self.objetivo} / {self.objetivo} min"
+            else:
+                self.progreso_porcentaje = 0
+                self.porcentaje_label = "0%"
+                if "agua" in self.nombre.lower():
+                    self.progreso_texto = "0 / 8 vasos"
+                else:
+                    self.progreso_texto = f"0 / {self.objetivo} min"
+
     def toggle_check(self):
         self.completado_hoy = not self.completado_hoy
         if self.completado_hoy:
             self.sesiones += 1
             self.racha += 1
             self.total_min += self.objetivo
+            self.progreso_porcentaje = 100
+            self.porcentaje_label = "100%"
+            if "agua" in self.nombre.lower():
+                self.progreso_texto = "8 / 8 vasos"
+            else:
+                self.progreso_texto = f"{self.objetivo} / {self.objetivo} min"
         else:
             self.sesiones = max(0, self.sesiones - 1)
             self.racha = max(0, self.racha - 1)
             self.total_min = max(0, self.total_min - self.objetivo)
+            self.progreso_porcentaje = 0
+            self.porcentaje_label = "0%"
+            if "agua" in self.nombre.lower():
+                self.progreso_texto = "0 / 8 vasos"
+            else:
+                self.progreso_texto = f"0 / {self.objetivo} min"
 
         if self.inicio_screen:
             self.inicio_screen.actualizar_estado_habito(
@@ -220,39 +288,63 @@ class InicioScreen(MDScreen):
     _habitos_demo = [
         {
             "id": 1,
-            "nombre": "Beber 2L de agua",
-            "descripcion": "Meta diaria de hidratación",
+            "nombre": "Beber agua",
+            "descripcion": "8 vasos de agua pura al día",
             "total_sesiones": 5,
             "racha_dias": 5,
             "total_segundos": 9000,
             "objetivo_diario_minutos": 30,
             "categoria": "Salud",
             "horario": "08:00 AM",
-            "completado_hoy": True
+            "completado_hoy": True,
+            "progreso_texto": "8 / 8 vasos",
+            "progreso_porcentaje": 100,
+            "icono": "water"
         },
         {
             "id": 2,
-            "nombre": "Lectura técnica de código",
-            "descripcion": "Libros de arquitectura y patrones",
-            "total_sesiones": 3,
-            "racha_dias": 3,
+            "nombre": "Lectura técnica",
+            "descripcion": "Leer y profundizar en temas técnicos relevantes.",
+            "total_sesiones": 5,
+            "racha_dias": 5,
             "total_segundos": 5400,
-            "objetivo_diario_minutos": 45,
+            "objetivo_diario_minutos": 30,
             "categoria": "Estudio",
             "horario": "07:00 PM",
-            "completado_hoy": False
+            "completado_hoy": True,
+            "progreso_texto": "30 / 30 min",
+            "progreso_porcentaje": 100,
+            "icono": "book-open-page-variant"
         },
         {
             "id": 3,
-            "nombre": "Rutina de entrenamiento",
+            "nombre": "Entrenamiento",
             "descripcion": "Fuerza y movilidad",
             "total_sesiones": 4,
             "racha_dias": 4,
             "total_segundos": 7200,
-            "objetivo_diario_minutos": 45,
+            "objetivo_diario_minutos": 60,
             "categoria": "Deporte",
             "horario": "06:30 PM",
-            "completado_hoy": True
+            "completado_hoy": True,
+            "progreso_texto": "45 / 60 min",
+            "progreso_porcentaje": 75,
+            "icono": "dumbbell"
+        },
+        {
+            "id": 4,
+            "nombre": "Estudiar Python",
+            "descripcion": "Algoritmos y desarrollo backend",
+            "total_sesiones": 0,
+            "racha_dias": 0,
+            "total_segundos": 0,
+            "objetivo_diario_minutos": 45,
+            "categoria": "Programación",
+            "horario": "09:00 PM",
+            "completado_hoy": False,
+            "progreso_texto": "0 / 45 min",
+            "progreso_porcentaje": 0,
+            "icono": "xml"
         }
     ]
 
@@ -270,6 +362,140 @@ class InicioScreen(MDScreen):
     def ir_a_perfil(self):
         if self.app:
             self.app.cambiar_pantalla('perfil', direccion='left')
+
+    def exportar_reporte(self, *args):
+        """Botón de Inicio: agenda la generación del Excel sin bloquear el toque."""
+        app = getattr(self, "app", None)
+        base_datos = getattr(app, "base_datos", None) if app else None
+
+        if not base_datos:
+            self._mostrar_dialogo_reporte(
+                "Reporte no disponible",
+                "No hay conexión con la base de datos. Intenta reiniciar la aplicación.",
+            )
+            return
+
+        if not hasattr(base_datos, "obtener_datos_reporte"):
+            self._mostrar_dialogo_reporte(
+                "Reporte no disponible",
+                "La base de datos activa no expone el método de reporte.",
+            )
+            return
+
+        usuario = getattr(app, "usuario_actual", None) or {}
+        usuario_id = None
+        if isinstance(usuario, dict):
+            usuario_id = usuario.get("id")
+            if usuario_id is None:
+                usuario_id = usuario.get("id_usuario")
+        if usuario_id is None:
+            usuario_id = getattr(self, "current_user_id", None)
+
+        if usuario_id is None:
+            self._mostrar_dialogo_reporte(
+                "Reporte no disponible",
+                "No hay un usuario activo del cual generar el reporte.",
+            )
+            return
+
+        Clock.schedule_once(
+            lambda dt: self._generar_reporte(usuario_id, usuario), 0.1
+        )
+
+    def _preparar_datos_reporte(self, datos):
+        """Si la BD no tiene hábitos, usa los visibles en Inicio y lo marca."""
+        if datos.get("habitos"):
+            datos["fuente"] = datos.get("fuente") or "bd"
+            datos["fuente_detalle"] = "Base de datos real"
+            return datos
+
+        habitos_demo = []
+        for habito in (self._habitos_demo or []):
+            if not isinstance(habito, dict):
+                continue
+            habitos_demo.append({
+                "id_habito": habito.get("id"),
+                "nombre": habito.get("nombre") or "Sin nombre",
+                "categoria": habito.get("categoria") or "Sin categoría",
+                "objetivo_minutos": int(habito.get("objetivo_diario_minutos") or 30),
+                "sesiones_completadas": int(habito.get("total_sesiones") or 0),
+                "total_segundos": int(habito.get("total_segundos") or 0),
+                "racha_dias": int(habito.get("racha_dias") or 0),
+            })
+
+        datos["habitos"] = habitos_demo
+        datos["fuente"] = "demo"
+        datos["fuente_detalle"] = "Hábitos visibles en Inicio (demo)"
+
+        # Los ids de demo no existen en la BD: evita vincular metas reales
+        # con hábitos incorrectos solo por coincidencia numérica.
+        datos["metas"] = [
+            dict(meta, id_habito=0)
+            for meta in (datos.get("metas") or [])
+            if isinstance(meta, dict)
+        ]
+        return datos
+
+    def _generar_reporte(self, usuario_id, usuario):
+        try:
+            datos = self.app.base_datos.obtener_datos_reporte(usuario_id)
+            if not isinstance(datos, dict):
+                raise ValueError("La base de datos no devolvió un reporte válido.")
+            datos = self._preparar_datos_reporte(datos)
+            resultado = generar_reporte_excel(datos)
+        except Exception as e:
+            print(f"Error exportando reporte: {e}")
+            self._mostrar_dialogo_reporte(
+                "No se pudo exportar",
+                f"No se generó el archivo.\nDetalle: {e}",
+            )
+            return
+
+        habitos = datos.get("habitos") or []
+        metas = datos.get("metas") or []
+        modo = str(datos.get("modo") or "desconocido").upper()
+
+        avisos = []
+        if datos.get("fuente") == "demo":
+            avisos.append(
+                "La BD no devolvió hábitos; se exportaron los hábitos visibles en Inicio (demo)."
+            )
+        if resultado.get("formato") == "csv":
+            avisos.append(
+                "Se creó un CSV con BOM UTF-8 porque openpyxl no está instalado. "
+                "Para obtener XLSX con formato, instala: pip install openpyxl"
+            )
+        detalle = ("\n\n" + "\n".join(avisos)) if avisos else ""
+
+        self._mostrar_dialogo_reporte(
+            "Reporte exportado",
+            f"Archivo: {resultado.get('ruta')}\n"
+            f"Base de datos: {modo}\n"
+            f"Fuente de hábitos: {datos.get('fuente_detalle') or 'Base de datos real'}\n"
+            f"Hábitos: {len(habitos)} · Metas: {len(metas)}{detalle}",
+        )
+
+    def _mostrar_dialogo_reporte(self, titulo, texto):
+        if self.dialog and hasattr(self.dialog, "dismiss"):
+            try:
+                self.dialog.dismiss()
+            except Exception:
+                pass
+
+        dialogo = MDDialog(
+            title=titulo,
+            text=texto,
+            buttons=[
+                MDRaisedButton(
+                    text="Aceptar",
+                    md_bg_color=(0.06, 0.76, 0.52, 1),
+                    on_release=lambda x: dialogo.dismiss(),
+                )
+            ],
+            size_hint=(0.9, None),
+        )
+        self.dialog = dialogo
+        dialogo.open()
 
     def on_pre_enter(self):
         if not self.app or not getattr(self.app, 'usuario_actual', None):
@@ -381,6 +607,9 @@ class InicioScreen(MDScreen):
                         categoria=habit.get('categoria', 'Salud'),
                         horario=habit.get('horario', '07:00 PM'),
                         completado_hoy=habit.get('completado_hoy', False),
+                        icono=habit.get('icono', ''),
+                        progreso_texto=habit.get('progreso_texto', ''),
+                        progreso_porcentaje=habit.get('progreso_porcentaje', 100 if habit.get('completado_hoy') else 0),
                         app=self.app,
                         inicio_screen=self
                     )

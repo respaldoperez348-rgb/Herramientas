@@ -5,127 +5,144 @@
 <AlertaRiesgoCard>:
     orientation: 'vertical'
     size_hint_y: None
-    height: dp(165)
-    padding: dp(14)
-    spacing: dp(8)
+    height: dp(148)
+    padding: [dp(16), dp(12), dp(16), dp(12)]
+    spacing: dp(6)
     radius: [dp(12), dp(12), dp(12), dp(12)]
-    md_bg_color: 0.22, 0.13, 0.15, 1
-    elevation: 3
+    md_bg_color: (app.color_acento[0], app.color_acento[1], app.color_acento[2], 0.12)
+    line_color: (app.color_acento[0], app.color_acento[1], app.color_acento[2], 0.35)
+    line_width: 1
+    elevation: 0
 
-    # Fila 1: Header de Alerta con porcentaje crítico
+    # Header de Alerta con porcentaje crítico
     BoxLayout:
         orientation: 'horizontal'
         size_hint_y: None
         height: dp(26)
-        spacing: dp(6)
+        spacing: dp(8)
 
-        MDIconButton:
+        MDIcon:
             icon: "alert-decagram"
+            font_size: "18sp"
             theme_text_color: "Custom"
-            text_color: 1, 0.4, 0.4, 1
-            size_hint: None, None
-            size: dp(24), dp(24)
-            padding: dp(2)
+            text_color: app.color_acento
+            size_hint_x: None
+            width: dp(20)
+            pos_hint: {'center_y': 0.5}
 
         MDLabel:
-            text: f"Riesgo: {root.nombre_habito}"
+            text: f"Riesgo de Abandono: {root.nombre_habito}"
             font_style: "Subtitle2"
             bold: True
             theme_text_color: "Custom"
-            text_color: 1, 0.4, 0.4, 1
+            text_color: app.color_acento
             size_hint_x: 0.65
             shorten: True
             shorten_from: 'right'
+            pos_hint: {'center_y': 0.5}
 
         MDLabel:
             text: f"{int(root.porcentaje_cumplimiento)}% cumplido"
-            font_style: "Caption"
+            font_size: "11sp"
             bold: True
             halign: "right"
             theme_text_color: "Custom"
-            text_color: 1, 0.75, 0.2, 1
+            text_color: app.text_primary
             size_hint_x: 0.35
+            pos_hint: {'center_y': 0.5}
 
-    # Fila 2: Diagnóstico del auditor de 7-14 días
+    # Diagnóstico del auditor
     MDLabel:
         text: root.diagnostico
         font_style: "Caption"
         theme_text_color: "Custom"
-        text_color: 0.85, 0.85, 0.9, 1
+        text_color: app.text_primary
         size_hint_y: None
-        height: dp(28)
+        height: dp(26)
+        shorten: True
+        shorten_from: 'right'
 
-    # Fila 3: Recomendación Contextual
+    # Recomendación Contextual
     MDCard:
         size_hint_y: None
-        height: dp(50)
+        height: dp(34)
         radius: [dp(8), dp(8), dp(8), dp(8)]
-        md_bg_color: 0.16, 0.12, 0.18, 1
-        padding: [dp(8), dp(4)]
+        md_bg_color: app.card_item_bg
+        padding: [dp(10), dp(4)]
         elevation: 0
 
         BoxLayout:
             orientation: 'horizontal'
             spacing: dp(6)
 
-            MDIconButton:
+            MDIcon:
                 icon: "lightbulb-on-outline"
+                font_size: "14sp"
                 theme_text_color: "Custom"
-                text_color: 1, 0.85, 0.2, 1
-                size_hint: None, None
-                size: dp(20), dp(20)
-                padding: dp(2)
+                text_color: app.color_progreso
+                size_hint_x: None
+                width: dp(16)
+                pos_hint: {'center_y': 0.5}
 
             MDLabel:
                 text: root.recomendacion
-                font_style: "Caption"
+                font_size: "10sp"
                 theme_text_color: "Custom"
-                text_color: 1, 0.9, 0.7, 1
+                text_color: app.text_secondary
+                shorten: True
+                shorten_from: 'right'
+                pos_hint: {'center_y': 0.5}
 
-    # Fila 4: Botones de Acción
+    # Botones de Acción Rápida (Reajustar y Horario)
     BoxLayout:
         orientation: 'horizontal'
         size_hint_y: None
-        height: dp(28)
+        height: dp(26)
         spacing: dp(8)
 
         MDFillRoundFlatButton:
-            text: "Reajustar Meta"
+            text: "Reajustar Meta (-50%)"
             font_size: "10sp"
-            size_hint_x: 0.5
-            size_hint_y: None
-            height: dp(26)
-            md_bg_color: 0.9, 0.3, 0.3, 0.85
+            size_hint: None, None
+            size: dp(150), dp(24)
+            md_bg_color: app.color_acento
             text_color: 1, 1, 1, 1
+            elevation: 0
             on_release: root.accion_reajustar()
 
         MDFillRoundFlatButton:
-            text: "Crear Alerta"
+            text: "Ajustar Horario"
             font_size: "10sp"
-            size_hint_x: 0.5
-            size_hint_y: None
-            height: dp(26)
-            md_bg_color: 0.18, 0.24, 0.35, 1
-            text_color: 0, 0.97, 1, 1
+            size_hint: None, None
+            size: dp(115), dp(24)
+            md_bg_color: app.card_item_bg
+            line_color: app.card_border
+            line_width: 1
+            text_color: app.text_primary
+            elevation: 0
             on_release: root.accion_recordatorio()
 
-
 <MensajeChatWidget>:
-    orientation: 'vertical'
+    orientation: 'horizontal'
     size_hint_y: None
     height: self.minimum_height
-    padding: dp(6)
-    spacing: dp(2)
+    padding: [dp(4), dp(2)]
+    spacing: dp(8)
+
+    # Espacio para alinear a derecha si es usuario
+    Widget:
+        size_hint_x: 0.25 if root.es_usuario else 0.001
 
     MDCard:
-        size_hint_x: 0.88
+        size_hint_x: 0.75
         size_hint_y: None
         height: self.minimum_height
-        pos_hint: {'right': 0.98} if root.es_usuario else {'x': 0.02}
-        radius: [dp(14), dp(14), dp(2), dp(14)] if root.es_usuario else [dp(14), dp(14), dp(14), dp(2)]
-        md_bg_color: (0.1, 0.45, 0.75, 1) if root.es_usuario else (0.14, 0.18, 0.26, 1)
-        padding: [dp(12), dp(10)]
-        elevation: 2
+        radius: [dp(14), dp(14), 0, dp(14)] if root.es_usuario else [dp(14), dp(14), dp(14), 0]
+        md_bg_color: (app.color_acento[0], app.color_acento[1], app.color_acento[2], 0.12) if root.es_usuario else app.card_item_bg
+        line_color: (app.color_acento[0], app.color_acento[1], app.color_acento[2], 0.35) if root.es_usuario else app.card_border
+        line_width: 1
+        padding: [dp(14), dp(10), dp(14), dp(10)]
+        elevation: 0
 
         BoxLayout:
             orientation: 'vertical'
@@ -133,316 +150,207 @@
             height: self.minimum_height
             spacing: dp(4)
 
-            # Nombre remitente
-            MDLabel:
-                text: "Tú" if root.es_usuario else "🤖 Asistente Contextual"
-                font_style: "Caption"
-                bold: True
-                theme_text_color: "Custom"
-                text_color: (0.7, 0.9, 1, 1) if root.es_usuario else (0, 0.97, 1, 1)
+            BoxLayout:
+                orientation: 'horizontal'
                 size_hint_y: None
-                height: dp(14)
+                height: dp(16)
+                spacing: dp(6)
 
-            # Texto del mensaje
+                MDIcon:
+                    icon: "account" if root.es_usuario else "robot"
+                    font_size: "12sp"
+                    theme_text_color: "Custom"
+                    text_color: app.color_acento if root.es_usuario else app.color_progreso
+                    size_hint_x: None
+                    width: dp(14)
+                    pos_hint: {'center_y': 0.5}
+
+                MDLabel:
+                    text: "Tú" if root.es_usuario else "Asistente HabitPulse"
+                    font_size: "10sp"
+                    bold: True
+                    theme_text_color: "Custom"
+                    text_color: app.text_secondary
+
             MDLabel:
                 text: root.texto
-                font_style: "Body2"
+                font_size: "12sp"
                 theme_text_color: "Custom"
-                text_color: 1, 1, 1, 1
+                text_color: app.text_primary
                 size_hint_y: None
                 height: self.texture_size[1]
                 text_size: self.width, None
 
+    # Espacio para alinear a izquierda si es bot
+    Widget:
+        size_hint_x: 0.25 if not root.es_usuario else 0.001
 
 <AsistenteScreen>:
-    FloatLayout:
-        canvas.before:
-            Color:
-                rgba: 0.07, 0.09, 0.13, 1
-            Rectangle:
-                pos: self.pos
-                size: self.size
+    md_bg_color: app.bg_app
 
-        # Header Superior
+    BoxLayout:
+        orientation: 'horizontal'
+
+        # Sidebar de Navegación Fijo (Izquierda)
+        SidebarNav:
+            active_item: "asistente"
+
+        # Contenido Principal: Asistente & Chat
         BoxLayout:
             orientation: 'vertical'
-            size_hint: 0.92, None
-            height: dp(75)
-            pos_hint: {'center_x': 0.5, 'top': 0.98}
-            spacing: dp(2)
+            padding: [dp(32), dp(24), dp(36), dp(24)]
+            spacing: dp(14)
 
+            # Header Superior
             BoxLayout:
                 orientation: 'horizontal'
                 size_hint_y: None
-                height: dp(36)
+                height: dp(50)
 
-                MDLabel:
-                    text: "Asistente Contextual"
-                    font_style: "H6"
-                    bold: True
-                    theme_text_color: "Custom"
-                    text_color: 0, 0.97, 1, 1
-                    halign: "left"
-                    size_hint_x: 0.7
+                BoxLayout:
+                    orientation: 'vertical'
+                    spacing: dp(2)
+                    pos_hint: {'center_y': 0.5}
+
+                    MDLabel:
+                        text: "Asistente Contextual"
+                        font_style: "H4"
+                        bold: True
+                        theme_text_color: "Custom"
+                        text_color: app.text_primary
+
+                    MDLabel:
+                        text: "Detección de riesgo de abandono (<50%) y coaching guiado"
+                        font_style: "Subtitle2"
+                        theme_text_color: "Custom"
+                        text_color: app.text_secondary
 
                 # Chip de Estado IA
                 MDCard:
                     size_hint: None, None
-                    size: dp(100), dp(28)
-                    radius: [dp(14), dp(14), dp(14), dp(14)]
-                    md_bg_color: 0.16, 0.73, 0.51, 0.2
+                    size: dp(120), dp(32)
+                    radius: [dp(16), dp(16), dp(16), dp(16)]
+                    md_bg_color: (app.color_progreso[0], app.color_progreso[1], app.color_progreso[2], 0.16)
                     elevation: 0
                     pos_hint: {'center_y': 0.5}
 
                     MDLabel:
                         text: "● Auditor 7-14d"
-                        font_size: "10sp"
+                        font_size: "11sp"
                         bold: True
                         halign: "center"
                         valign: "middle"
                         theme_text_color: "Custom"
-                        text_color: 0.16, 0.85, 0.55, 1
+                        text_color: app.color_progreso
 
-            MDLabel:
-                text: "Prevención de deserción (<50%) y motivación guiada"
-                font_style: "Caption"
-                theme_text_color: "Custom"
-                text_color: 0.65, 0.7, 0.8, 1
-                size_hint_y: None
-                height: dp(18)
-
-        # Contenedor con Scroll para Auditoría y Chat
-        ScrollView:
-            id: scroll_asistente
-            size_hint: 0.92, 0.70
-            pos_hint: {'center_x': 0.5, 'y': 0.14}
-            effect_cls: ScrollEffect
-
+            # Área de Alertas de Riesgo (si las hay)
             BoxLayout:
+                id: contenedor_alertas_riesgo
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
-                spacing: dp(14)
-                padding: [0, dp(4), 0, dp(15)]
+                spacing: dp(10)
 
-                # Sección 1: Título Auditoría
+            # Chips de Preguntas Frecuentes Rápidas
+            ScrollView:
+                size_hint_y: None
+                height: dp(34)
+                do_scroll_y: False
+                do_scroll_x: True
+
                 BoxLayout:
                     orientation: 'horizontal'
-                    size_hint_y: None
-                    height: dp(24)
-                    spacing: dp(6)
+                    size_hint_x: None
+                    width: self.minimum_width
+                    spacing: dp(8)
 
-                    MDIconButton:
-                        icon: "radar"
-                        theme_text_color: "Custom"
-                        text_color: 0, 0.97, 1, 1
-                        size_hint: None, None
-                        size: dp(24), dp(24)
-                        padding: dp(2)
+                    MDFillRoundFlatButton:
+                        text: "¿Qué hábito está en riesgo?"
+                        font_size: "10sp"
+                        md_bg_color: app.card_item_bg
+                        line_color: app.card_border
+                        line_width: 1
+                        text_color: app.text_primary
+                        elevation: 0
+                        on_release: root.enviar_consulta_rapida("¿Qué hábito está en riesgo de abandono?")
 
-                    MDLabel:
-                        text: "Auditoría de Deserción Reciente"
-                        font_style: "Subtitle2"
-                        bold: True
-                        theme_text_color: "Custom"
-                        text_color: 1, 1, 1, 1
+                    MDFillRoundFlatButton:
+                        text: "Reajustar metas"
+                        font_size: "10sp"
+                        md_bg_color: app.card_item_bg
+                        line_color: app.card_border
+                        line_width: 1
+                        text_color: app.text_primary
+                        elevation: 0
+                        on_release: root.enviar_consulta_rapida("¿Cómo reajusto mis metas para no desertar?")
 
-                # Contenedor dinámico de alertas de riesgo (< 50%)
-                BoxLayout:
-                    id: contenedor_alertas_riesgo
-                    orientation: 'vertical'
-                    size_hint_y: None
-                    height: self.minimum_height
-                    spacing: dp(10)
+                    MDFillRoundFlatButton:
+                        text: "Salvar racha"
+                        font_size: "10sp"
+                        md_bg_color: app.card_item_bg
+                        line_color: app.card_border
+                        line_width: 1
+                        text_color: app.text_primary
+                        elevation: 0
+                        on_release: root.enviar_consulta_rapida("¿Cómo recupero mi racha si fallé un día?")
 
-                # Sección 2: Título Chat Interactivo
-                BoxLayout:
-                    orientation: 'horizontal'
-                    size_hint_y: None
-                    height: dp(24)
-                    spacing: dp(6)
+                    MDFillRoundFlatButton:
+                        text: "Regla de 2 min"
+                        font_size: "10sp"
+                        md_bg_color: app.card_item_bg
+                        line_color: app.card_border
+                        line_width: 1
+                        text_color: app.text_primary
+                        elevation: 0
+                        on_release: root.enviar_consulta_rapida("Explícame la regla de los 2 minutos")
 
-                    MDIconButton:
-                        icon: "chat-processing-outline"
-                        theme_text_color: "Custom"
-                        text_color: 0.8, 0.6, 1, 1
-                        size_hint: None, None
-                        size: dp(24), dp(24)
-                        padding: dp(2)
+            # Historial del Chat (ScrollView)
+            ScrollView:
+                id: scroll_asistente
+                effect_cls: ScrollEffect
+                do_scroll_x: False
 
-                    MDLabel:
-                        text: "Interacción y Asesoría Guiada"
-                        font_style: "Subtitle2"
-                        bold: True
-                        theme_text_color: "Custom"
-                        text_color: 1, 1, 1, 1
-
-                # Chips de Preguntas Frecuentes Rápidas
-                ScrollView:
-                    size_hint_y: None
-                    height: dp(36)
-                    do_scroll_y: False
-                    do_scroll_x: True
-
-                    BoxLayout:
-                        orientation: 'horizontal'
-                        size_hint_x: None
-                        width: self.minimum_width
-                        spacing: dp(6)
-
-                        MDFillRoundFlatButton:
-                            text: "📊 ¿Qué hábito está en riesgo?"
-                            font_size: "10sp"
-                            md_bg_color: 0.16, 0.20, 0.28, 1
-                            text_color: 0, 0.97, 1, 1
-                            on_release: root.enviar_consulta_rapida("¿Qué hábito está en riesgo de abandono?")
-
-                        MDFillRoundFlatButton:
-                            text: "🎯 Reajustar metas"
-                            font_size: "10sp"
-                            md_bg_color: 0.16, 0.20, 0.28, 1
-                            text_color: 0, 0.97, 1, 1
-                            on_release: root.enviar_consulta_rapida("¿Cómo reajusto mis metas para no desertar?")
-
-                        MDFillRoundFlatButton:
-                            text: "🔥 Salvar racha"
-                            font_size: "10sp"
-                            md_bg_color: 0.16, 0.20, 0.28, 1
-                            text_color: 0, 0.97, 1, 1
-                            on_release: root.enviar_consulta_rapida("¿Cómo recupero mi racha si fallé un día?")
-
-                        MDFillRoundFlatButton:
-                            text: "⚡ Regla de 2 min"
-                            font_size: "10sp"
-                            md_bg_color: 0.16, 0.20, 0.28, 1
-                            text_color: 0, 0.97, 1, 1
-                            on_release: root.enviar_consulta_rapida("Explícame la regla de los 2 minutos")
-
-                # Contenedor del Historial del Chat
                 BoxLayout:
                     id: contenedor_chat
                     orientation: 'vertical'
                     size_hint_y: None
                     height: self.minimum_height
+                    spacing: dp(10)
+                    padding: [0, dp(6), 0, dp(10)]
+
+            # Barra de Entrada de Chat Interactiva
+            MDCard:
+                size_hint_y: None
+                height: dp(48)
+                radius: [dp(24), dp(24), dp(24), dp(24)]
+                md_bg_color: app.card_bg
+                line_color: app.card_border
+                line_width: 1
+                padding: [dp(16), dp(4)]
+                elevation: 0
+
+                BoxLayout:
+                    orientation: 'horizontal'
                     spacing: dp(8)
 
-        # Barra de Entrada de Chat Interactiva
-        MDCard:
-            size_hint: 0.92, None
-            height: dp(48)
-            pos_hint: {'center_x': 0.5, 'y': 0.08}
-            radius: [dp(24), dp(24), dp(24), dp(24)]
-            md_bg_color: 0.14, 0.18, 0.25, 1
-            padding: [dp(12), dp(2)]
-            elevation: 4
+                    TextInput:
+                        id: campo_chat_mensaje
+                        hint_text: "Pregúntale algo al Asistente..."
+                        font_size: "13sp"
+                        multiline: False
+                        size_hint_x: 0.88
+                        background_color: 0, 0, 0, 0
+                        foreground_color: app.text_primary
+                        cursor_color: app.color_acento
+                        hint_text_color: app.text_secondary
+                        padding: [dp(4), dp(10)]
+                        on_text_validate: root.enviar_mensaje()
 
-            BoxLayout:
-                orientation: 'horizontal'
-                spacing: dp(6)
-
-                TextInput:
-                    id: campo_chat_mensaje
-                    hint_text: "Pregúntale algo al Asistente..."
-                    font_size: "13sp"
-                    multiline: False
-                    size_hint_x: 0.82
-                    background_color: 0, 0, 0, 0
-                    foreground_color: 1, 1, 1, 1
-                    cursor_color: 0, 0.97, 1, 1
-                    hint_text_color: 0.6, 0.65, 0.75, 1
-                    padding: [dp(4), dp(12)]
-                    on_text_validate: root.enviar_mensaje()
-
-                MDIconButton:
-                    icon: "send"
-                    theme_text_color: "Custom"
-                    text_color: 0, 0.97, 1, 1
-                    size_hint: None, None
-                    size: dp(40), dp(40)
-                    pos_hint: {'center_y': 0.5}
-                    on_release: root.enviar_mensaje()
-
-        # Barra de Navegación Inferior Móvil
-        MDCard:
-            size_hint: 1, None
-            height: dp(56)
-            pos_hint: {'bottom': 1, 'center_x': 0.5}
-            md_bg_color: 0.10, 0.13, 0.18, 1
-            elevation: 8
-            radius: [dp(14), dp(14), 0, 0]
-            padding: [dp(4), dp(2)]
-
-            BoxLayout:
-                orientation: 'horizontal'
-
-                # Tab 1: Inicio
-                BoxLayout:
-                    orientation: 'vertical'
-                    size_hint_x: 0.25
-                    spacing: 0
                     MDIconButton:
-                        icon: "view-dashboard"
+                        icon: "send"
                         theme_text_color: "Custom"
-                        text_color: 0.5, 0.55, 0.65, 1
-                        pos_hint: {'center_x': 0.5}
-                        on_release: root.app.cambiar_pantalla('inicio', 'right')
-                    MDLabel:
-                        text: "Hábitos"
-                        font_size: "9sp"
-                        halign: "center"
-                        theme_text_color: "Custom"
-                        text_color: 0.5, 0.55, 0.65, 1
-
-                # Tab 2: Metas
-                BoxLayout:
-                    orientation: 'vertical'
-                    size_hint_x: 0.25
-                    spacing: 0
-                    MDIconButton:
-                        icon: "target"
-                        theme_text_color: "Custom"
-                        text_color: 0.5, 0.55, 0.65, 1
-                        pos_hint: {'center_x': 0.5}
-                        on_release: root.app.cambiar_pantalla('metas', 'right')
-                    MDLabel:
-                        text: "Metas"
-                        font_size: "9sp"
-                        halign: "center"
-                        theme_text_color: "Custom"
-                        text_color: 0.5, 0.55, 0.65, 1
-
-                # Tab 3: Recordatorios
-                BoxLayout:
-                    orientation: 'vertical'
-                    size_hint_x: 0.25
-                    spacing: 0
-                    MDIconButton:
-                        icon: "bell-ring"
-                        theme_text_color: "Custom"
-                        text_color: 0.5, 0.55, 0.65, 1
-                        pos_hint: {'center_x': 0.5}
-                        on_release: root.app.cambiar_pantalla('recordatorios', 'right')
-                    MDLabel:
-                        text: "Horarios"
-                        font_size: "9sp"
-                        halign: "center"
-                        theme_text_color: "Custom"
-                        text_color: 0.5, 0.55, 0.65, 1
-
-                # Tab 4: Asistente (Activo)
-                BoxLayout:
-                    orientation: 'vertical'
-                    size_hint_x: 0.25
-                    spacing: 0
-                    MDIconButton:
-                        icon: "robot"
-                        theme_text_color: "Custom"
-                        text_color: 0, 0.97, 1, 1
-                        pos_hint: {'center_x': 0.5}
-                    MDLabel:
-                        text: "Asistente"
-                        font_size: "9sp"
-                        bold: True
-                        halign: "center"
-                        theme_text_color: "Custom"
-                        text_color: 0, 0.97, 1, 1
+                        text_color: app.color_acento
+                        size_hint: None, None
+                        size: dp(40), dp(40)
+                        pos_hint: {'center_y': 0.5}
+                        on_release: root.enviar_mensaje()
