@@ -12,23 +12,52 @@ except ImportError:
     RealDictCursor = None
 
 
+
 class BaseDatos:
-    def __init__(self, ruta_sqlite=None):
-        os.environ.setdefault("PGCLIENTENCODING", "UTF8")
-        self.modo = "postgres"
-        self.conn = None
-        self.cursor = None
+    def __init__(self):
+        db_host = os.getenv("DB_HOST", "localhost")
+        db_name = os.getenv("DB_NAME", "habitos_bd")
+        db_user = os.getenv("DB_USER", "postgres")
+        db_password = os.getenv("DB_PASSWORD", "12345")
+        db_port = os.getenv("DB_PORT", "5432")
 
-        if ruta_sqlite is None:
-            base_dir = os.path.dirname(os.path.abspath(__file__))
-            ruta_sqlite = os.path.join(base_dir, "habitpulse.db")
-        self.ruta_sqlite = ruta_sqlite
-
-        if not self._conectar_postgres():
-            self._conectar_sqlite()
-
+        self.conn = psycopg2.connect(
+            host=db_host,
+            database=db_name,
+            user=db_user,
+            password=db_password,
+            port=db_port,
+        )
+        self.cursor = self.conn.cursor(cursor_factory=RealDictCursor)
+        print("Conectado a la base de datos")
+        self._verificar_esquema_compatible()
         self.crear_tablas()
 
+    def _verificar_esquema_compatible(self):
+        """Verifica si existen tablas antiguas sin columna 'id' y limpia el esquema si es incompatible."""
+        try:
+            for tabla in ("usuarios", "habitos"):
+                self.cursor.execute("""
+                    SELECT EXISTS (
+                        SELECT 1 FROM information_schema.tables 
+                        WHERE table_schema = 'public' AND table_name = %s
+                    ) AS existe_tabla
+                """, (tabla,))
+                if self.cursor.fetchone()["existe_tabla"]:
+                    self.cursor.execute("""
+                        SELECT EXISTS (
+                            SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'public' AND table_name = %s AND column_name = 'id'
+                        ) AS tiene_id
+                    """, (tabla,))
+                    if not self.cursor.fetchone()["tiene_id"]:
+                        print(f"Esquema antiguo detectado en '{tabla}'. Recreando tablas limpias...")
+                        self.cursor.execute("DROP SCHEMA public CASCADE; CREATE SCHEMA public;")
+                        self.conn.commit()
+                        break
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Error verificando esquema: {e}")
 
     def _conectar_postgres(self):
         if psycopg2 is None:
@@ -319,7 +348,6 @@ class BaseDatos:
     # =================== MÉTODOS DE HÁBITOS ===================
     def crear_habito(self, usuario_id, nombre, descripcion="", objetivo_minutos=30, categoria="Salud"):
         try:
-            # Mapear categoría a icono y color
             mapeo_categorias = {
                 "Salud": {"icono": "dumbbell", "color": "#10b981"},
                 "Aprendizaje": {"icono": "book-open", "color": "#3b82f6"},
@@ -563,8 +591,6 @@ class BaseDatos:
             print(f"Error calculando promedio: {e}")
             return 0
 
-
-
     def obtener_estadisticas_usuario(self, usuario_id):
         try:
             self.cursor.execute(
@@ -583,6 +609,7 @@ class BaseDatos:
             if not stats:
                 return {"total_habitos": 0, "total_sesiones": 0, "total_segundos": 0, "racha_total": 0}
 
+            racha_total = self.calcular_racha_total(usuario_id)
             return {
                 "total_habitos": stats["total_habitos"],
                 "total_sesiones": stats["total_sesiones"],
