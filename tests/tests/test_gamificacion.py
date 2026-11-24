@@ -17,7 +17,6 @@ def test_racha_7_dias_desbloquea_racha_de_fuego():
     insignias = obtener_insignias(racha=7)
     assert "Racha de Fuego" in insignias
 
-
 def test_racha_menor_a_7_no_desbloquea_racha_de_fuego():
     insignias = obtener_insignias(racha=6)
     assert "Racha de Fuego" not in insignias
