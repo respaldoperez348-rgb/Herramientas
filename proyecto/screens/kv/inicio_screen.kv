@@ -372,11 +372,12 @@
                                     theme_text_color: "Custom"
                                     text_color: app.text_primary
 
-                # Cabecera Sección: Hábitos de hoy + Botón Nuevo Hábito
+                # Cabecera Sección: Hábitos de hoy + Exportar + Nuevo Hábito
                 BoxLayout:
                     orientation: 'horizontal'
                     size_hint_y: None
                     height: dp(42)
+                    spacing: dp(8)
 
                     MDLabel:
                         text: "Hábitos de hoy"
@@ -385,6 +386,18 @@
                         theme_text_color: "Custom"
                         text_color: app.text_primary
                         pos_hint: {'center_y': 0.5}
+
+                    MDRaisedButton:
+                        text: "Exportar Excel"
+                        font_size: "11sp"
+                        size_hint_x: None
+                        width: dp(124)
+                        size_hint_y: None
+                        height: dp(36)
+                        md_bg_color: app.color_progreso
+                        text_color: 1, 1, 1, 1
+                        pos_hint: {'center_y': 0.5}
+                        on_release: root.exportar_reporte()
 
                     MDFillRoundFlatButton:
                         text: "+ Nuevo hábito"

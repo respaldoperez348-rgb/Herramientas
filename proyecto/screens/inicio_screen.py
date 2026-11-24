@@ -6,6 +6,7 @@ from kivymd.uix.dialog import MDDialog
 from kivymd.uix.textfield import MDTextField
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivy.uix.screenmanager import SlideTransition
+from kivy.clock import Clock
 from kivy.properties import StringProperty, NumericProperty, BooleanProperty, ListProperty
 from datetime import datetime
 
@@ -19,6 +20,17 @@ except ImportError:
         import os
         sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         from gamificacion import SistemaGamificacion
+
+try:
+    from exportar_reporte import exportar_reporte as generar_reporte_excel
+except ImportError:
+    try:
+        from proyecto.exportar_reporte import exportar_reporte as generar_reporte_excel
+    except ImportError:
+        import sys
+        import os
+        sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from exportar_reporte import exportar_reporte as generar_reporte_excel
 
 class InsigniaCardItem(MDCard):
     titulo = StringProperty("")
@@ -350,6 +362,140 @@ class InicioScreen(MDScreen):
     def ir_a_perfil(self):
         if self.app:
             self.app.cambiar_pantalla('perfil', direccion='left')
+
+    def exportar_reporte(self, *args):
+        """Botón de Inicio: agenda la generación del Excel sin bloquear el toque."""
+        app = getattr(self, "app", None)
+        base_datos = getattr(app, "base_datos", None) if app else None
+
+        if not base_datos:
+            self._mostrar_dialogo_reporte(
+                "Reporte no disponible",
+                "No hay conexión con la base de datos. Intenta reiniciar la aplicación.",
+            )
+            return
+
+        if not hasattr(base_datos, "obtener_datos_reporte"):
+            self._mostrar_dialogo_reporte(
+                "Reporte no disponible",
+                "La base de datos activa no expone el método de reporte.",
+            )
+            return
+
+        usuario = getattr(app, "usuario_actual", None) or {}
+        usuario_id = None
+        if isinstance(usuario, dict):
+            usuario_id = usuario.get("id")
+            if usuario_id is None:
+                usuario_id = usuario.get("id_usuario")
+        if usuario_id is None:
+            usuario_id = getattr(self, "current_user_id", None)
+
+        if usuario_id is None:
+            self._mostrar_dialogo_reporte(
+                "Reporte no disponible",
+                "No hay un usuario activo del cual generar el reporte.",
+            )
+            return
+
+        Clock.schedule_once(
+            lambda dt: self._generar_reporte(usuario_id, usuario), 0.1
+        )
+
+    def _preparar_datos_reporte(self, datos):
+        """Si la BD no tiene hábitos, usa los visibles en Inicio y lo marca."""
+        if datos.get("habitos"):
+            datos["fuente"] = datos.get("fuente") or "bd"
+            datos["fuente_detalle"] = "Base de datos real"
+            return datos
+
+        habitos_demo = []
+        for habito in (self._habitos_demo or []):
+            if not isinstance(habito, dict):
+                continue
+            habitos_demo.append({
+                "id_habito": habito.get("id"),
+                "nombre": habito.get("nombre") or "Sin nombre",
+                "categoria": habito.get("categoria") or "Sin categoría",
+                "objetivo_minutos": int(habito.get("objetivo_diario_minutos") or 30),
+                "sesiones_completadas": int(habito.get("total_sesiones") or 0),
+                "total_segundos": int(habito.get("total_segundos") or 0),
+                "racha_dias": int(habito.get("racha_dias") or 0),
+            })
+
+        datos["habitos"] = habitos_demo
+        datos["fuente"] = "demo"
+        datos["fuente_detalle"] = "Hábitos visibles en Inicio (demo)"
+
+        # Los ids de demo no existen en la BD: evita vincular metas reales
+        # con hábitos incorrectos solo por coincidencia numérica.
+        datos["metas"] = [
+            dict(meta, id_habito=0)
+            for meta in (datos.get("metas") or [])
+            if isinstance(meta, dict)
+        ]
+        return datos
+
+    def _generar_reporte(self, usuario_id, usuario):
+        try:
+            datos = self.app.base_datos.obtener_datos_reporte(usuario_id)
+            if not isinstance(datos, dict):
+                raise ValueError("La base de datos no devolvió un reporte válido.")
+            datos = self._preparar_datos_reporte(datos)
+            resultado = generar_reporte_excel(datos)
+        except Exception as e:
+            print(f"Error exportando reporte: {e}")
+            self._mostrar_dialogo_reporte(
+                "No se pudo exportar",
+                f"No se generó el archivo.\nDetalle: {e}",
+            )
+            return
+
+        habitos = datos.get("habitos") or []
+        metas = datos.get("metas") or []
+        modo = str(datos.get("modo") or "desconocido").upper()
+
+        avisos = []
+        if datos.get("fuente") == "demo":
+            avisos.append(
+                "La BD no devolvió hábitos; se exportaron los hábitos visibles en Inicio (demo)."
+            )
+        if resultado.get("formato") == "csv":
+            avisos.append(
+                "Se creó un CSV con BOM UTF-8 porque openpyxl no está instalado. "
+                "Para obtener XLSX con formato, instala: pip install openpyxl"
+            )
+        detalle = ("\n\n" + "\n".join(avisos)) if avisos else ""
+
+        self._mostrar_dialogo_reporte(
+            "Reporte exportado",
+            f"Archivo: {resultado.get('ruta')}\n"
+            f"Base de datos: {modo}\n"
+            f"Fuente de hábitos: {datos.get('fuente_detalle') or 'Base de datos real'}\n"
+            f"Hábitos: {len(habitos)} · Metas: {len(metas)}{detalle}",
+        )
+
+    def _mostrar_dialogo_reporte(self, titulo, texto):
+        if self.dialog and hasattr(self.dialog, "dismiss"):
+            try:
+                self.dialog.dismiss()
+            except Exception:
+                pass
+
+        dialogo = MDDialog(
+            title=titulo,
+            text=texto,
+            buttons=[
+                MDRaisedButton(
+                    text="Aceptar",
+                    md_bg_color=(0.06, 0.76, 0.52, 1),
+                    on_release=lambda x: dialogo.dismiss(),
+                )
+            ],
+            size_hint=(0.9, None),
+        )
+        self.dialog = dialogo
+        dialogo.open()
 
     def on_pre_enter(self):
         if not self.app or not getattr(self.app, 'usuario_actual', None):
