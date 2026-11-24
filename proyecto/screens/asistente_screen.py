@@ -69,7 +69,7 @@ class AsistenteScreen(MDScreen):
             except Exception as e:
                 print(f"Nota: Consulta de auditoría en BD: {e}")
 
-        if datos_auditados:
+        if datos_auditados is not None:
             habitos_en_riesgo = datos_auditados
         else:
             # Algoritmo de detección sobre registros simulados del Avance 2 (seed.sql)

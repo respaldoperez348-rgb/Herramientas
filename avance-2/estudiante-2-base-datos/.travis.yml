@@ -1,0 +1,9 @@
+language: python
+python:
+  - "3.10"
+
+install:
+  - pip install psycopg2-binary
+
+script:
+   - python -m py_compile database_extension.py
