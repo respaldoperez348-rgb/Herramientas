@@ -19,6 +19,7 @@ from screens.recordatorios_screen import RecordatoriosScreen
 from screens.asistente_screen import AsistenteScreen
 from screens.detalle_habito_screen import DetalleHabitoScreen
 from screens.perfil_screen import PerfilScreen
+from screens.estadisticas_screen import EstadisticasScreen
 
 Window.size = (1080, 680)
 Window.resizable = True
@@ -87,6 +88,7 @@ class HabitTrackerApp(MDApp):
             RegisterScreen(name='registro'),
             InicioScreen(name='inicio'),
             MetasScreen(name='metas'),
+            EstadisticasScreen(name='estadisticas'),
             RecordatoriosScreen(name='recordatorios'),
             AsistenteScreen(name='asistente'),
             DetalleHabitoScreen(name='detalle_habito'),
@@ -106,6 +108,7 @@ class HabitTrackerApp(MDApp):
             'registro_screen.kv',
             'inicio_screen.kv',
             'metas_screen.kv',
+            'estadisticas_screen.kv',
             'recordatorios_screen.kv',
             'asistente_screen.kv',
             'detalle_habito_screen.kv',

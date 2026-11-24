@@ -1,0 +1,486 @@
+#:kivy 2.0.0
+#:import ScrollEffect kivy.effects.scroll.ScrollEffect
+#:import dp kivy.metrics.dp
+
+<KpiCard@MDCard>:
+    titulo: ""
+    valor: ""
+    icono: "chart-line"
+    color_icono: [0.88, 0.24, 0.36, 1]
+    size_hint: 0.25, None
+    height: dp(94)
+    radius: [dp(12), dp(12), dp(12), dp(12)]
+    md_bg_color: app.card_bg
+    line_color: app.card_border
+    line_width: 1
+    elevation: 0
+    padding: [dp(14), dp(12), dp(14), dp(12)]
+
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: dp(4)
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: dp(24)
+
+            MDLabel:
+                text: root.titulo
+                font_size: "10.5sp"
+                bold: True
+                theme_text_color: "Custom"
+                text_color: app.text_secondary
+                size_hint_x: 0.8
+                shorten: True
+
+            MDIcon:
+                icon: root.icono
+                font_size: "18sp"
+                size_hint_x: 0.2
+                halign: 'right'
+                theme_text_color: "Custom"
+                text_color: root.color_icono
+
+        MDLabel:
+            text: root.valor
+            font_size: "20sp"
+            bold: True
+            theme_text_color: "Custom"
+            text_color: app.text_primary
+
+
+<BarraDiaSemana@BoxLayout>:
+    dia_nombre: "Lun"
+    altura_ratio: 0.5
+    orientation: 'vertical'
+    spacing: dp(6)
+    size_hint_x: 1
+
+    # Contenedor de la barra vertical
+    AnchorLayout:
+        anchor_x: 'center'
+        anchor_y: 'bottom'
+        size_hint_y: 0.82
+
+        Widget:
+            size_hint_x: None
+            width: dp(26)
+            canvas:
+                # Fondo de la barra
+                Color:
+                    rgba: app.track_bg
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [dp(6), dp(6), dp(6), dp(6)]
+                # Progreso de la barra
+                Color:
+                    rgba: app.color_progreso
+                RoundedRectangle:
+                    pos: self.pos
+                    size: (self.width, self.height * root.altura_ratio)
+                    radius: [dp(6), dp(6), dp(6), dp(6)]
+
+    # Etiqueta del día
+    MDLabel:
+        text: root.dia_nombre
+        font_size: "10.5sp"
+        halign: "center"
+        size_hint_y: 0.18
+        theme_text_color: "Custom"
+        text_color: app.text_secondary
+
+
+<FilaCategoriaProgreso@BoxLayout>:
+    categoria_nombre: ""
+    tiempo_label: ""
+    icono: "circle"
+    ratio: 0.25
+    color_barra: [0.06, 0.76, 0.52, 1]
+    orientation: 'vertical'
+    size_hint_y: None
+    height: dp(42)
+    spacing: dp(4)
+
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: dp(18)
+        spacing: dp(6)
+
+        MDIcon:
+            icon: root.icono
+            font_size: "14sp"
+            size_hint: None, None
+            size: dp(14), dp(14)
+            theme_text_color: "Custom"
+            text_color: root.color_barra if root.color_barra else [0.06, 0.76, 0.52, 1]
+            pos_hint: {'center_y': 0.5}
+
+        MDLabel:
+            text: root.categoria_nombre
+            font_size: "11sp"
+            bold: True
+            theme_text_color: "Custom"
+            text_color: app.text_primary
+            size_hint_x: 0.55
+            shorten: True
+
+        MDLabel:
+            text: root.tiempo_label
+            font_size: "10sp"
+            halign: "right"
+            theme_text_color: "Custom"
+            text_color: app.text_secondary
+            size_hint_x: 0.45
+
+    # Barra de progreso horizontal
+    Widget:
+        size_hint_y: None
+        height: dp(8)
+        canvas:
+            Color:
+                rgba: app.track_bg
+            RoundedRectangle:
+                pos: self.pos
+                size: self.size
+                radius: [dp(4), dp(4), dp(4), dp(4)]
+            Color:
+                rgba: root.color_barra if root.color_barra else [0.06, 0.76, 0.52, 1]
+            RoundedRectangle:
+                pos: self.pos
+                size: (self.width * root.ratio, self.height)
+                radius: [dp(4), dp(4), dp(4), dp(4)]
+
+
+<EstadisticasScreen>:
+    md_bg_color: app.bg_app
+
+    BoxLayout:
+        orientation: 'horizontal'
+
+        # Sidebar de Navegación Fijo
+        SidebarNav:
+            active_item: "estadisticas"
+
+        # Contenido Principal con Scroll
+        ScrollView:
+            effect_cls: ScrollEffect
+            do_scroll_x: False
+
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+                padding: [dp(32), dp(24), dp(36), dp(32)]
+                spacing: dp(18)
+
+                # ================= HEADER SUPERIOR =================
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: dp(54)
+
+                    BoxLayout:
+                        orientation: 'vertical'
+                        spacing: dp(2)
+                        pos_hint: {'center_y': 0.5}
+
+                        MDLabel:
+                            text: "Analíticas y Rendimiento"
+                            font_style: "H4"
+                            bold: True
+                            theme_text_color: "Custom"
+                            text_color: app.text_primary
+
+                        MDLabel:
+                            text: "Tendencias semanales, consistencia y balance de enfoque"
+                            font_style: "Subtitle2"
+                            theme_text_color: "Custom"
+                            text_color: app.text_secondary
+
+                    # Botón Exportar Reporte
+                    MDFillRoundFlatIconButton:
+                        icon: "file-chart-outline"
+                        text: "Exportar Reporte"
+                        font_size: "12sp"
+                        pos_hint: {'center_y': 0.5}
+                        md_bg_color: app.color_acento
+                        text_color: 1, 1, 1, 1
+                        icon_color: 1, 1, 1, 1
+                        elevation: 0
+                        on_release: root.exportar_analiticas()
+
+                # ================= 1. TARJETAS KPI =================
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: dp(94)
+                    spacing: dp(14)
+
+                    KpiCard:
+                        titulo: "Consistencia"
+                        valor: root.tasa_consistencia
+                        icono: "percent"
+                        color_icono: app.color_progreso
+
+                    KpiCard:
+                        titulo: "Tiempo Total"
+                        valor: root.tiempo_total_texto
+                        icono: "clock-outline"
+                        color_icono: app.color_acento
+
+                    KpiCard:
+                        titulo: "Sesiones"
+                        valor: root.total_sesiones_texto
+                        icono: "check-circle-outline"
+                        color_icono: app.color_progreso
+
+                    KpiCard:
+                        titulo: "Racha Máxima"
+                        valor: root.racha_maxima_texto
+                        icono: "fire"
+                        color_icono: app.color_acento
+
+                # ================= 2. GRÁFICO SEMANAL + CATEGORÍAS =================
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: dp(240)
+                    spacing: dp(16)
+
+                    # Tarjeta Izquierda: Balance de Consistencia Semanal
+                    MDCard:
+                        size_hint_x: 0.58
+                        radius: [dp(14), dp(14), dp(14), dp(14)]
+                        md_bg_color: app.card_bg
+                        line_color: app.card_border
+                        line_width: 1
+                        elevation: 0
+                        padding: [dp(18), dp(16), dp(18), dp(16)]
+                        orientation: 'vertical'
+                        spacing: dp(10)
+
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            size_hint_y: None
+                            height: dp(24)
+
+                            MDLabel:
+                                text: "Balance Semanal de Rendimiento"
+                                font_style: "Subtitle1"
+                                bold: True
+                                theme_text_color: "Custom"
+                                text_color: app.text_primary
+
+                            MDLabel:
+                                text: "Promedio: " + root.tasa_consistencia
+                                font_size: "11sp"
+                                bold: True
+                                halign: "right"
+                                theme_text_color: "Custom"
+                                text_color: app.color_progreso
+
+                        # 7 Barras Semanales (Lun - Dom)
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            spacing: dp(8)
+
+                            BarraDiaSemana:
+                                dia_nombre: "Lun"
+                                altura_ratio: root.altura_lun
+
+                            BarraDiaSemana:
+                                dia_nombre: "Mar"
+                                altura_ratio: root.altura_mar
+
+                            BarraDiaSemana:
+                                dia_nombre: "Mié"
+                                altura_ratio: root.altura_mie
+
+                            BarraDiaSemana:
+                                dia_nombre: "Jue"
+                                altura_ratio: root.altura_jue
+
+                            BarraDiaSemana:
+                                dia_nombre: "Vie"
+                                altura_ratio: root.altura_vie
+
+                            BarraDiaSemana:
+                                dia_nombre: "Sáb"
+                                altura_ratio: root.altura_sab
+
+                            BarraDiaSemana:
+                                dia_nombre: "Dom"
+                                altura_ratio: root.altura_dom
+
+                    # Tarjeta Derecha: Distribución por Categorías
+                    MDCard:
+                        size_hint_x: 0.42
+                        radius: [dp(14), dp(14), dp(14), dp(14)]
+                        md_bg_color: app.card_bg
+                        line_color: app.card_border
+                        line_width: 1
+                        elevation: 0
+                        padding: [dp(18), dp(16), dp(18), dp(16)]
+                        orientation: 'vertical'
+                        spacing: dp(6)
+
+                        MDLabel:
+                            text: "Distribución por Categorías"
+                            font_style: "Subtitle1"
+                            bold: True
+                            theme_text_color: "Custom"
+                            text_color: app.text_primary
+                            size_hint_y: None
+                            height: dp(24)
+
+                        FilaCategoriaProgreso:
+                            categoria_nombre: "Estudio & Lectura"
+                            tiempo_label: root.estudio_minutos
+                            icono: "book-open-page-variant"
+                            ratio: root.estudio_porcentaje
+                            color_barra: app.color_acento
+
+                        FilaCategoriaProgreso:
+                            categoria_nombre: "Salud & Hidratación"
+                            tiempo_label: root.salud_minutos
+                            icono: "water"
+                            ratio: root.salud_porcentaje
+                            color_barra: app.color_progreso
+
+                        FilaCategoriaProgreso:
+                            categoria_nombre: "Deporte & Fitness"
+                            tiempo_label: root.deporte_minutos
+                            icono: "dumbbell"
+                            ratio: root.deporte_porcentaje
+                            color_barra: (0.25, 0.60, 0.95, 1)
+
+                        FilaCategoriaProgreso:
+                            categoria_nombre: "Enfoque & Programación"
+                            tiempo_label: root.enfoque_minutos
+                            icono: "code-braces"
+                            ratio: root.enfoque_porcentaje
+                            color_barra: (0.95, 0.65, 0.15, 1)
+
+                # ================= 3. DIAGNÓSTICO DE HÁBITOS =================
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: dp(100)
+                    spacing: dp(16)
+
+                    # Hábito Estrella
+                    MDCard:
+                        size_hint_x: 0.5
+                        radius: [dp(12), dp(12), dp(12), dp(12)]
+                        md_bg_color: app.card_item_bg
+                        line_color: app.card_border
+                        line_width: 1
+                        elevation: 0
+                        padding: [dp(16), dp(12), dp(16), dp(12)]
+
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            spacing: dp(12)
+                            pos_hint: {'center_y': 0.5}
+
+                            MDCard:
+                                size_hint: None, None
+                                size: dp(42), dp(42)
+                                radius: [dp(21), dp(21), dp(21), dp(21)]
+                                md_bg_color: (app.color_progreso[0], app.color_progreso[1], app.color_progreso[2], 0.16)
+                                elevation: 0
+                                pos_hint: {'center_y': 0.5}
+
+                                MDIcon:
+                                    icon: "trophy-outline"
+                                    font_size: "22sp"
+                                    theme_text_color: "Custom"
+                                    text_color: app.color_progreso
+                                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
+                            BoxLayout:
+                                orientation: 'vertical'
+                                spacing: dp(2)
+                                pos_hint: {'center_y': 0.5}
+
+                                MDLabel:
+                                    text: "HÁBITO ESTRELLA"
+                                    font_size: "10sp"
+                                    bold: True
+                                    theme_text_color: "Custom"
+                                    text_color: app.color_progreso
+
+                                MDLabel:
+                                    text: root.habito_destacado_nombre
+                                    font_size: "13sp"
+                                    bold: True
+                                    theme_text_color: "Custom"
+                                    text_color: app.text_primary
+                                    shorten: True
+
+                                MDLabel:
+                                    text: root.habito_destacado_detalle
+                                    font_size: "10sp"
+                                    theme_text_color: "Custom"
+                                    text_color: app.text_secondary
+                                    shorten: True
+
+                    # Oportunidad de Mejora
+                    MDCard:
+                        size_hint_x: 0.5
+                        radius: [dp(12), dp(12), dp(12), dp(12)]
+                        md_bg_color: app.card_item_bg
+                        line_color: app.card_border
+                        line_width: 1
+                        elevation: 0
+                        padding: [dp(16), dp(12), dp(16), dp(12)]
+
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            spacing: dp(12)
+                            pos_hint: {'center_y': 0.5}
+
+                            MDCard:
+                                size_hint: None, None
+                                size: dp(42), dp(42)
+                                radius: [dp(21), dp(21), dp(21), dp(21)]
+                                md_bg_color: (app.color_acento[0], app.color_acento[1], app.color_acento[2], 0.16)
+                                elevation: 0
+                                pos_hint: {'center_y': 0.5}
+
+                                MDIcon:
+                                    icon: "trending-up"
+                                    font_size: "22sp"
+                                    theme_text_color: "Custom"
+                                    text_color: app.color_acento
+                                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
+                            BoxLayout:
+                                orientation: 'vertical'
+                                spacing: dp(2)
+                                pos_hint: {'center_y': 0.5}
+
+                                MDLabel:
+                                    text: "OPORTUNIDAD DE MEJORA"
+                                    font_size: "10sp"
+                                    bold: True
+                                    theme_text_color: "Custom"
+                                    text_color: app.color_acento
+
+                                MDLabel:
+                                    text: root.habito_riesgo_nombre
+                                    font_size: "13sp"
+                                    bold: True
+                                    theme_text_color: "Custom"
+                                    text_color: app.text_primary
+                                    shorten: True
+
+                                MDLabel:
+                                    text: root.habito_riesgo_detalle
+                                    font_size: "10sp"
+                                    theme_text_color: "Custom"
+                                    text_color: app.text_secondary
+                                    shorten: True
